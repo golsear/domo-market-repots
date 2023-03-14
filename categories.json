@@ -1,0 +1,34 @@
+{
+  "Brand strength": [
+    "Brand awareness (Watch category)",
+    "Brand familiarity",
+    "Brand love",
+    "Association with achievement",
+    "Net promoter score",
+    "Earned Coverage Sentiment score"
+  ],
+  "CSR & Planet": [
+    "Association to CSR & Planet (Average)",
+    "Perpetual Planet Survey",
+    "Reptrak Score Citizenship score",
+    "Rolex.org traffic"
+  ],
+  "Digital strength": [
+    "Rolex.com traffic (all sources)",
+    "Organic search",
+    "Social media followers"
+  ],
+  "Retailer quality": [
+    "Visits to Rolex section of Retailer website",
+    "Retailer traffic from organic search",
+    "Retailer social media followers",
+    "Store image deployment"
+  ],
+  "Sponsoring": [
+    "Number of testimonees",
+    "Number of events",
+    "Association with sports",
+    "Association with arts",
+    "Net sponsorship value"
+  ]
+}

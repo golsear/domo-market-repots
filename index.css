@@ -1,0 +1,195 @@
+@font-face {
+  font-family: "Helvetica-Now";
+  src: url("https://static.rolex.com/Fonts/Rolex/HelveticaNow/10d97c98-c7f0-4958-b294-92319d027783.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Rolex";
+  src: url("https://static.rolex.com/Fonts/Rolex/RolexFont/2.1/RolexFont-Regular-WebS.woff2") format("woff2");
+}
+
+.grid {
+	display: grid;
+  color: #767676;
+  grid-template-columns: 30% 10% 40% 10% 10%;
+  grid-auto-flow: column;
+  font-family: Open Sans, Helvetica Neue, Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  line-height: 14px;
+}
+
+.grid > div {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  border: 1px solid #d2d2d2;
+  border-width: 0 1px 1px 0;
+  padding: 20px 10px;
+}
+
+.grid.grid-total > div {
+  border: 1px solid transparent;
+  border-width: 0 1px 1px 0;
+}
+
+.total-value {
+  align-items: center;
+  display: flex;
+	font-size: 20px;
+	font-weight: bold;
+  color: #FFFFFF;
+}
+
+.total-value-poor {
+  background: #BA1314;
+  
+}
+
+.total-value-static {
+	background: #d2d2d2;  
+}
+
+.total-value-title {
+  align-items: center;
+  display: flex;
+	font-size: 14px;
+	font-weight: bold;
+}
+
+.total-value-title-poor {
+  color: #BA1314;
+  
+}
+
+.total-value-title-static {
+	color: #d2d2d2;  
+}
+
+.grid > div:last-of-type {
+	border-right-width: 0;
+}
+
+.kpi-title {
+  color: #333333;
+  font-size: 14px;
+  line-height: 16px;
+  font-weight: bold;
+}
+
+.kpi-line {
+  height: 2px;
+  background: #c0c0c0;
+	position: relative;
+  z-index: 10;
+}
+
+.kpi-line-range {
+  height: 2px;
+  background: #767676;
+  position: absolute;
+  z-index: 11;
+}
+
+.kpi-line-selected-range {
+  height: 2px;
+  background: #ba1314;
+	position: absolute;
+  z-index: 12;
+}
+
+
+.kpi-point {
+  height: 8px;
+  width: 8px;
+  background: #767676;
+  color: #767676;
+	position: absolute;
+  border-radius: 50%; 
+  margin: -3px 0 0 -4px;
+  z-index: 14;
+}
+
+.kpi-point-global {
+	height: 20px;
+  width: 20px;
+  background: #333333;
+  color: #333333;
+  margin: -9px 0 0 -10px;
+  z-index: 13;
+}
+
+.kpi-point-selected {
+	background: #ba1314;
+  color: #ba1314;
+}
+
+.kpi-point-global .kpi-point-value {
+	top: -16px;
+  font-size: 14px;
+  line-height: 16px;
+}
+
+.kpi-point-value {
+  position: absolute;
+  right: 50%;
+  transform: translate(50%,0);
+  top: -12px;
+  font-size: 10px;
+  line-height: 12px;
+  font-weight: bold;
+}
+
+.kpi-point-title {
+  position: absolute;
+  right: 50%;
+  transform: translate(50%,0);
+  bottom: -20px;
+  font-size: 12px;
+  line-height: 14px;
+  font-weight: bold;
+}
+
+
+.kpi-change {
+  align-items: center;
+  display: flex;
+  font-size: 14px;
+	font-weight: bold;
+}
+
+.kpi-change-down {
+	color: #ba1314;
+}
+
+.kpi-change-up {
+	color: #1D9464;
+}
+
+.kpi-change-arrow {
+	margin-left: 5px;
+}
+
+.kpi-change-arrow-down {
+	width: 0; 
+  height: 0; 
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 10px solid #BA1314;
+}
+
+.kpi-change-arrow-up {
+	width: 0; 
+  height: 0; 
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 10px solid #1D9464;
+}
+
+.align-items-center {
+	align-items: center;
+}
+
+.text-selected {
+  color: #333333;
+  font-weight: bold;
+}
+
