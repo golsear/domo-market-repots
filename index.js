@@ -1,7 +1,11 @@
 
 const { createApp } = Vue
 const emitter = mitt()
-const app = createApp()
+const app = createApp({
+  			components: { Datepicker: VueDatePicker },
+    	})
+
+
 
 const domo = window.domo
 const datasets = window.datasets
@@ -56,25 +60,16 @@ const categoryDictionary = {
   ]
 }
 
-const groupByProperty = (arr, property) => {
-    	return arr.reduce((memo, x) => {
-    		if (!memo[x[property]]) { 
-          memo[x[property]] = [] 
-        }
-    		memo[x[property]].push(x);
-    		return memo;
-  		}, {});
-    }
-
 app.config.globalProperties.emitter = emitter
 
 app.component('MarketDashboard', {
-  template: `<div><slot :data="dataGroupByCategory"></slot></div>`,
+  template: `<div><slot :data="dataGroupByCategory" :updateData="updateData" :handleDate="handleDate" :date="date"></slot></div>`,
   props: [],
   data () {
     return { 
       data: [],
-      categoryDictionary
+      categoryDictionary,
+      date: ''
     }
   },
   computed: {
@@ -114,6 +109,17 @@ app.component('MarketDashboard', {
       })
   },
   methods: {
+    handleDate (date) {
+    	console.log('date', date)
+      this.date = date
+    },
+    updateData () {
+    	domo
+      .get(query)
+      .then((data) => {
+    		this.data = data
+      })
+    },
   	groupByProperty (arr, property) {
     	return arr.reduce((memo, x) => {
     		if (!memo[x[property]]) { 
@@ -135,17 +141,13 @@ app.component('KpiTable', {
 })
 
 app.component('KpiRow', {
-  template: `<div><slot :data="data" :d="dataGroupByMarket"></slot></div>`,
+  template: `<div><slot :data="data" :d="ddd"></slot></div>`,
   props: ['data'],
   computed: {
-  	dataGroupByMarket () {
-      const groupedData = this.data.kpiData ? groupByProperty(this.data.kpiData, 'Market') : []   
-      console.log('groupedData', groupedData)
-      
-      return groupedData
-      
-      //console.log('groupedData', groupedData)
-    	//return groupedData
+  	ddd () {
+      const d = this.data.kpiData
+      console.log('d', d)
+    	return d
     }
   },
   mounted() {

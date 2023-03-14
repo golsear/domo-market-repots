@@ -1,7 +1,15 @@
 <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<!-- <script src="https://unpkg.com/vue@latest"></script> -->
+<script src="https://unpkg.com/@vuepic/vue-datepicker@latest"></script>
 <script src="https://unpkg.com/mitt/dist/mitt.umd.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/@vuepic/vue-datepicker@latest/dist/main.css">
+
 <div id="app">
+  
   <market-dashboard v-slot="slotProps">
+  	<Datepicker v-model="slotProps.date" :value="slotProps.date" @update:model-value="slotProps.handleDate"></Datepicker>
+    {{ slotProps.date }}
+    <button @click="slotProps.updateData()">Update</button>
   	<div class="grid">
       <div>KPI</div>
       <div>Time frame</div>
@@ -91,5 +99,6 @@
         </template>
       </kpi-table>
 		</template>
+    
   </market-dashboard>
 </div>
