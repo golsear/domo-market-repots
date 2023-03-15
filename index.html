@@ -1,15 +1,23 @@
 <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-<!-- <script src="https://unpkg.com/vue@latest"></script> -->
-<script src="https://unpkg.com/@vuepic/vue-datepicker@latest"></script>
+<!-- <script src="https://unpkg.com/vue@latest"></script> --> 
 <script src="https://unpkg.com/mitt/dist/mitt.umd.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/@vuepic/vue-datepicker@latest/dist/main.css">
+
+<script src="https://unpkg.com/dayjs/dayjs.min.js"></script>
+<script src="https://unpkg.com/dayjs/plugin/customParseFormat.js"></script>
+<script src="https://unpkg.com/dayjs/plugin/weekday.js"></script>
+<script src="https://unpkg.com/dayjs/plugin/localeData.js"></script>
+<script src="https://unpkg.com/dayjs/plugin/weekOfYear.js"></script>
+<script src="https://unpkg.com/dayjs/plugin/weekYear.js"></script>
+<script src="https://unpkg.com/dayjs/plugin/advancedFormat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ant-design-vue/dist/antd.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ant-design-vue@3.2.15/dist/antd.min.css">
 
 <div id="app">
-  
   <market-dashboard v-slot="slotProps">
-  	<Datepicker v-model="slotProps.date" :value="slotProps.date" @update:model-value="slotProps.handleDate"></Datepicker>
-    {{ slotProps.date }}
-    <button @click="slotProps.updateData()">Update</button>
+    <a-date-picker v-model:value="slotProps.startYear" picker="year" @change="slotProps.changeYear"></a-date-picker>
+  	<a-date-picker v-model:value="slotProps.endYear" picker="year" @change="slotProps.changeYear"></a-date-picker>
+    
   	<div class="grid">
       <div>KPI</div>
       <div>Time frame</div>
@@ -94,7 +102,7 @@
         </div>
         <template v-for="(kpi, index) in slotProps.data.kpis" :key="`dataCategory-${index}`">
         	<kpi-row :data="kpi" v-slot="slotProps">
-            <div>{{ kpi.kpiCategory }}</div>
+            <div>{{slotProps.data.kpiCategory }}</div>
           </kpi-row>
         </template>
       </kpi-table>

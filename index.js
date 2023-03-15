@@ -1,11 +1,11 @@
 
 const { createApp } = Vue
 const emitter = mitt()
-const app = createApp({
-  			components: { Datepicker: VueDatePicker },
-    	})
+const app = createApp()
+app.use(antd)
+console.log(dayjs)
 
-
+console.log(window)
 
 const domo = window.domo
 const datasets = window.datasets
@@ -60,16 +60,35 @@ const categoryDictionary = {
   ]
 }
 
+const groupByProperty = (arr, property) => {
+    	return arr.reduce((memo, x) => {
+    		if (!memo[x[property]]) { 
+          memo[x[property]] = [] 
+        }
+    		memo[x[property]].push(x);
+    		return memo;
+  		}, {});
+    }
+
 app.config.globalProperties.emitter = emitter
 
 app.component('MarketDashboard', {
-  template: `<div><slot :data="dataGroupByCategory" :updateData="updateData" :handleDate="handleDate" :date="date"></slot></div>`,
+  template: `<div>
+							<slot 
+								:data="dataGroupByCategory" 
+								:updateData="updateData" 
+								:startYear="startYear"
+								:endYear="endYear"
+								:changeYear="changeYear">
+							</slot>
+						</div>`,
   props: [],
   data () {
     return { 
       data: [],
       categoryDictionary,
-      date: ''
+      startYear: '',
+      endYear: ''
     }
   },
   computed: {
@@ -103,15 +122,13 @@ app.component('MarketDashboard', {
       .get(query)
       .then((data) => {
     		this.data = data
-        console.log('res', data)
-      	console.log('data', this.data)
+        console.log('data', this.data)
       	console.log('dataGroupByCategory', this.dataGroupByCategory);
       })
   },
   methods: {
-    handleDate (date) {
-    	console.log('date', date)
-      this.date = date
+    changeYear (date, dateString) {
+    	console.log('changeYear', date, dateString)
     },
     updateData () {
     	domo
@@ -120,7 +137,8 @@ app.component('MarketDashboard', {
     		this.data = data
       })
     },
-  	groupByProperty (arr, property) {
+    groupByProperty 
+  	/* groupByProperty (arr, property) {
     	return arr.reduce((memo, x) => {
     		if (!memo[x[property]]) { 
           memo[x[property]] = [] 
@@ -128,7 +146,7 @@ app.component('MarketDashboard', {
     		memo[x[property]].push(x);
     		return memo;
   		}, {});
-    },
+    },*/
   }
 })
 
@@ -141,17 +159,55 @@ app.component('KpiTable', {
 })
 
 app.component('KpiRow', {
-  template: `<div><slot :data="data" :d="ddd"></slot></div>`,
+  template: `<div>
+							<slot :data="data" :dataByMarket="dataByMarket"> 
+							</slot>
+						</div>`,
   props: ['data'],
+  data () {
+    return { 
+      dataByMarket: [],
+    }
+  },
   computed: {
-  	ddd () {
-      const d = this.data.kpiData
-      console.log('d', d)
-    	return d
+  	/*dataByMarket () {
+      const groupByMarket = this.data.kpiData ? this.groupByProperty(this.data.kpiData, 'Market') : []
+      const dataByMarket = []
+      
+      for (const [key, value] of Object.entries(groupByMarket)) {
+  			console.log(key, value)
+        dataByMarket.push({
+        	category: key,
+          data: value.slice(-2)
+        })
+			}
+      
+      console.log('groupMyMarket', dataByMarket)
+    	return groupByMarket
+    }*/
+  },
+  watch: {
+  	data (data) {
+    	const groupByMarket = data.kpiData ? this.groupByProperty(data.kpiData, 'Market') : []
+      const dataByMarket = []
+      
+      for (const [category, data] of Object.entries(groupByMarket)) {
+  			dataByMarket.push({
+        	category,
+          data: data.slice(-2)
+        })
+			}
+      console.log('watch:data', data)
+      console.log('dataByMarket', dataByMarket)
+      console.log('groupByMarket', groupByMarket)
+      this.dataByMarket = groupByMarket
     }
   },
   mounted() {
   	// console.log('mounted KpiRow', this.data)
+  },
+  methods: {
+  	groupByProperty
   }
 })
 
