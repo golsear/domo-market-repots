@@ -1,0 +1,64 @@
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="https://unpkg.com/mitt/dist/mitt.umd.js"></script>
+<script src="https://unpkg.com/dayjs/dayjs.min.js"></script>
+<script src="https://unpkg.com/dayjs/plugin/customParseFormat.js"></script>
+<script src="https://unpkg.com/dayjs/plugin/weekday.js"></script>
+<script src="https://unpkg.com/dayjs/plugin/localeData.js"></script>
+<script src="https://unpkg.com/dayjs/plugin/weekOfYear.js"></script>
+<script src="https://unpkg.com/dayjs/plugin/weekYear.js"></script>
+<script src="https://unpkg.com/dayjs/plugin/advancedFormat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ant-design-vue/dist/antd.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ant-design-vue@3.2.15/dist/antd.min.css">
+
+
+<div id="app">
+  <Selectors  v-slot="slotProps">
+    <a-row>
+    	<a-col :span="24">
+        <div class="flex justify-content-center">
+        	<h2>Select two years</h2>
+        </div>
+      </a-col>
+    </a-row>
+    <a-row class="mb-40">
+    	<a-col :span="24">
+        <div class="flex justify-content-center">
+          <a-space :size="20">
+            <a-date-picker v-model:value="slotProps.startYear" picker="year" :disabled-date="slotProps.disabledDate" @change="slotProps.handleStartYear"></a-date-picker>
+        		<a-date-picker v-model:value="slotProps.endYear" picker="year" :disabled-date="slotProps.disabledDate" @change="slotProps.handleEndYear"></a-date-picker>
+          </a-space>
+        </div>
+      </a-col>
+  	</a-row>
+    <a-row>
+    	<a-col :span="24">
+        <div class="flex justify-content-center">
+        	<h2>Select two markets</h2>
+        </div>
+      </a-col>
+    </a-row>
+    <a-row>
+    	<a-col :span="24">
+        <div class="flex justify-content-center">
+            <a-space :size="20">
+              <a-select
+                v-model:value="slotProps.firstMarket"
+                show-search
+                placeholder="Select a market"
+                :options="slotProps.markets"
+                @change="slotProps.handleChangeFirstMarket"
+              ></a-select>
+              <a-select
+                v-model:value="slotProps.secondMarket"
+                show-search
+                placeholder="Select a market"
+                :options="slotProps.markets"
+                @change="slotProps.handleChangeSecondMarket"
+              ></a-select>
+          </a-space>
+        </div>
+      </a-col>
+  	</a-row>
+  </Selectors>
+</div>  
