@@ -206,7 +206,16 @@
 	justify-content: center;
 }
 
+.align-items-center {
+	align-items: center;
+}
+
+
 .mb-40 {
 	margin-bottom: 40px;
+}
+
+.spin-wrapper .ant-spin {
+	position: absolute;
 }
 

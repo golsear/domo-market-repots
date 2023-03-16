@@ -158,9 +158,14 @@
       </template>
     </div>
     <div v-else>
-    	Please select the markets and years.
+      <a-row>
+        <a-col :span="24">
+          <div class="spin-wrapper align-items-center flex justify-content-center">
+            <a-spin size="large" v-if="slotProps.isLoading"></a-spin>
+            Please select the markets and years.
+          </div>
+        </a-col>
+      </a-row>
     </div>
-    
-    
   </market-dashboard>
 </div>

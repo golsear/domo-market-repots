@@ -3,16 +3,24 @@ const { createApp } = Vue
 const emitter = mitt()
 const app = createApp()
 app.use(antd)
-console.log(dayjs)
+// console.log(dayjs)
 
 const domo = window.domo
+domo.onFiltersUpdate(console.log)
 const datasets = window.datasets
 const fields = [
   'Market', 
   'KPI', 
   'Description',
+  'Year',
   'Date',
 	'Value'
+]
+
+const filter = [
+	"Value != ''",
+  "Year in ['2021', '2022']",
+  "Market in ['Argentina', 'Mexico']"
 ]
 /*const orderby = [
   'Market', 
@@ -21,7 +29,8 @@ const fields = [
 ]*/
 
 // const query = `/data/v1/${datasets[0]}?fields=${fields.join()}&groupby=${groupby.join()}`
-const query = `/data/v1/${datasets[0]}?fields=${fields.join()}&filter=Value!=''`
+// const query = `/data/v1/${datasets[0]}?fields=${fields.join()}&filter=Value!=''`
+const query = `/data/v1/${datasets[0]}?fields=${fields.join()}&filter=${filter.join()}`
 
 const categoryDictionary = {
   "Brand strength": [
@@ -74,13 +83,13 @@ app.component('MarketDashboard', {
   template: `<div>
 							<slot 
 								:data="dataGroupByCategory" 
-								:updateData="updateData" 
 								:startYear="startYear"
 								:endYear="endYear"
 								:firstMarket="firstMarket"
 								:secondMarket="secondMarket"
 								:isShowGrid="isShowGrid"
-								:postMessage="postMessage">
+								:postMessage="postMessage"
+								:isLoading="isLoading">
 							</slot>
 						</div>`,
   props: [],
@@ -92,7 +101,8 @@ app.component('MarketDashboard', {
       endYear: '',
       firstMarket: '',
       secondMarket: '',
-      postMessage: ''
+      postMessage: '',
+      isLoading: false
     }
   },
   computed: {
@@ -121,24 +131,44 @@ app.component('MarketDashboard', {
       return groupedData
     },
     isShowGrid () {
-      return true
-    	// return this.startYear && this.endYear && this.firstMarket && this.secondMarket
+      // return true
+    	return this.startYear && this.endYear && this.firstMarket && this.secondMarket
+    },
+    query () {
+      const fields = [
+        'Market', 
+        'KPI', 
+        'Description',
+        'Year',
+        'Date',
+        'Value'
+      ]
+
+      const filter = [
+        "Value != ''",
+        `Year in ['${this.startYear}', '${this.endYear}']`,
+        `Market in ['${this.firstMarket}', '${this.secondMarket}']`
+      ]
+
+			const query = `/data/v1/${datasets[0]}?fields=${fields.join()}&filter=${filter.join()}`
+      
+      return query
     }
   },
   created () {
     this.emitter.on('update-selector', (event) => {
       // console.log('update-selector', event)
       this[event.selector] = event.value
+      this.getData()
     })
   },
-  mounted() {
-  	domo
-      .get(query)
+  mounted () {
+    // this.getData()
+    /*domo
+      .get(this.query)
       .then((data) => {
     		this.data = data
-        console.log('data', this.data)
-      	console.log('dataGroupByCategory', this.dataGroupByCategory);
-      })
+      })*/
     
     	// window.removeEventListener("message", this.iframeEvent, false)
       // window.addEventListener("message", this.iframeEvent, false)
@@ -151,12 +181,21 @@ app.component('MarketDashboard', {
 				// console.log('data received:  ' + event.data);
       this.postMessage = 'Post message'
     },
-    updateData () {
-    	domo
-      .get(query)
-      .then((data) => {
-    		this.data = data
-      })
+    async getData () {
+      try {
+        this.isLoading = true 
+        
+        if (!this.isShowGrid) {
+          const data = await domo.get(this.query) 
+        	this.data = data 
+          this.isLoading = false
+        	console.log('data', this.data)
+      		console.log('dataGroupByCategory', this.dataGroupByCategory);    
+        }
+      } catch (error) {
+      	console.log(error)
+        this.isLoading = false
+      }
     },
     groupByProperty 
   }
