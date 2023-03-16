@@ -193,3 +193,20 @@
   font-weight: bold;
 }
 
+/* Selectors */
+.selectors {
+	padding: 40px 0;
+}
+
+.flex {
+	display: flex;
+}
+
+.justify-content-center {
+	justify-content: center;
+}
+
+.mb-40 {
+	margin-bottom: 40px;
+}
+

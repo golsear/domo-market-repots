@@ -5,8 +5,6 @@ const app = createApp()
 app.use(antd)
 console.log(dayjs)
 
-console.log(window)
-
 const domo = window.domo
 const datasets = window.datasets
 const fields = [
@@ -79,7 +77,10 @@ app.component('MarketDashboard', {
 								:updateData="updateData" 
 								:startYear="startYear"
 								:endYear="endYear"
-								:changeYear="changeYear">
+								:firstMarket="firstMarket"
+								:secondMarket="secondMarket"
+								:isShowGrid="isShowGrid"
+								:postMessage="postMessage">
 							</slot>
 						</div>`,
   props: [],
@@ -88,7 +89,10 @@ app.component('MarketDashboard', {
       data: [],
       categoryDictionary,
       startYear: '',
-      endYear: ''
+      endYear: '',
+      firstMarket: '',
+      secondMarket: '',
+      postMessage: ''
     }
   },
   computed: {
@@ -116,6 +120,16 @@ app.component('MarketDashboard', {
       
       return groupedData
     },
+    isShowGrid () {
+      return true
+    	// return this.startYear && this.endYear && this.firstMarket && this.secondMarket
+    }
+  },
+  created () {
+    this.emitter.on('update-selector', (event) => {
+      // console.log('update-selector', event)
+      this[event.selector] = event.value
+    })
   },
   mounted() {
   	domo
@@ -125,10 +139,17 @@ app.component('MarketDashboard', {
         console.log('data', this.data)
       	console.log('dataGroupByCategory', this.dataGroupByCategory);
       })
+    
+    	// window.removeEventListener("message", this.iframeEvent, false)
+      // window.addEventListener("message", this.iframeEvent, false)
   },
   methods: {
-    changeYear (date, dateString) {
-    	console.log('changeYear', date, dateString)
+    iframeEvent(event) {
+      console.log('iframeEvent')
+				//Verify App Domain
+				// if(event.origin !== 'https://www.xyz.com') return;
+				// console.log('data received:  ' + event.data);
+      this.postMessage = 'Post message'
     },
     updateData () {
     	domo
@@ -138,15 +159,6 @@ app.component('MarketDashboard', {
       })
     },
     groupByProperty 
-  	/* groupByProperty (arr, property) {
-    	return arr.reduce((memo, x) => {
-    		if (!memo[x[property]]) { 
-          memo[x[property]] = [] 
-        }
-    		memo[x[property]].push(x);
-    		return memo;
-  		}, {});
-    },*/
   }
 })
 
@@ -168,23 +180,6 @@ app.component('KpiRow', {
     return { 
       dataByMarket: [],
     }
-  },
-  computed: {
-  	/*dataByMarket () {
-      const groupByMarket = this.data.kpiData ? this.groupByProperty(this.data.kpiData, 'Market') : []
-      const dataByMarket = []
-      
-      for (const [key, value] of Object.entries(groupByMarket)) {
-  			console.log(key, value)
-        dataByMarket.push({
-        	category: key,
-          data: value.slice(-2)
-        })
-			}
-      
-      console.log('groupMyMarket', dataByMarket)
-    	return groupByMarket
-    }*/
   },
   watch: {
   	data (data) {
@@ -211,12 +206,76 @@ app.component('KpiRow', {
   }
 })
 
+app.component('Selectors', {
+  template: `<div>
+							<slot 
+								:startYear="startYear"
+								:endYear="endYear"
+								:handleStartYear="handleStartYear"
+								:handleEndYear="handleEndYear"
+								:markets="markets"
+								:firstMarket="firstMarket"
+								:secondMarket="secondMarket"
+								:handleChangeFirstMarket="handleChangeFirstMarket"
+								:handleChangeSecondMarket="handleChangeSecondMarket"
+								:disabledDate="disabledDate">
+              </slot>
+						</div>`,
+  props: [],
+  data () {
+    return { 
+      startYear: '',
+      endYear: '',
+      markets: [
+        { value: 'Mexico', label: 'Mexico' },
+        { value: 'Global', label: 'Global' }
+      ],
+      firstMarket: undefined,
+      secondMarket: undefined,
+      allowedYears: ['2021', '2022', '2023']
+    }
+  },
+  methods: {
+    sendMessage() {
+				console.log('Send message')
+      	// window.postMessage(JSON.stringify("Post message"), "*")
+			},
+    handleStartYear (date, dateString) {
+    	console.log('handleStartYear', date, dateString)
+      this.emitter.emit('update-selector', {
+        selector: 'startYear',
+      	value: dateString
+      })
+      this.sendMessage()
+    },
+    handleEndYear (date, dateString) {
+    	console.log('handleEndYear', date, dateString)
+      this.emitter.emit('update-selector', {
+        selector: 'endYear',
+      	value: dateString
+      })
+    },
+    handleChangeFirstMarket (market) {
+    	console.log('handleChangeFirstMarket', market)
+      this.firstMarket = market
+      this.emitter.emit('update-selector', {
+        selector: 'firstMarket',
+      	value: market
+      })
+    },
+    handleChangeSecondMarket (market) {
+    	console.log('handleChangeSecondMarket', market)
+      this.secondMarket = market
+      this.emitter.emit('update-selector', {
+        selector: 'secondMarket',
+      	value: market
+      })
+    },
+    disabledDate (current) {
+    	const currentYear =  current.format('YYYY')
+      return !this.allowedYears.includes(currentYear)
+    }
+  }
+})
 
 app.mount('#app')
- /*createApp({
-    data() {
-      return {
-        message: 'Hello Vue!'
-      }
-    }
-  }).mount('#app')*/
