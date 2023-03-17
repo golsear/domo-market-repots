@@ -17,6 +17,7 @@
 
 <div id="app">
   <market-dashboard v-slot="slotProps">
+    <!--
     <Selectors class="selectors" v-slot="slotProps">
       <a-row>
         <a-col :span="24">
@@ -29,8 +30,8 @@
         <a-col :span="24">
           <div class="flex justify-content-center">
             <a-space :size="20">
-              <a-date-picker v-model:value="slotProps.startYear" picker="year" :disabled-date="slotProps.disabledDate" @change="slotProps.handleStartYear"></a-date-picker>
-              <a-date-picker v-model:value="slotProps.endYear" picker="year" :disabled-date="slotProps.disabledDate" @change="slotProps.handleEndYear"></a-date-picker>
+              <a-date-picker v-model:value="slotProps.firstYear" picker="year" :disabled-date="slotProps.disabledDate" @change="slotProps.handleFirstYear"></a-date-picker>
+              <a-date-picker v-model:value="slotProps.secondYear" picker="year" :disabled-date="slotProps.disabledDate" @change="slotProps.handleSecondYear"></a-date-picker>
             </a-space>
           </div>
         </a-col>
@@ -65,6 +66,7 @@
         </a-col>
       </a-row>
     </Selectors>
+		-->
     
   	<div v-if="slotProps.isShowGrid">
       <div class="grid">
@@ -132,8 +134,18 @@
         <div class="total-value-title total-value-title-static">Static</div>
       </div>
       <template v-for="(dataCategory, index) in slotProps.data" :key="`dataCategory-${index}`">
-        <kpi-table :data="dataCategory" v-slot="slotProps">
+        <kpi-table 
+        	:data="dataCategory"
+          :first-year="slotProps.firstYear"
+          :second-year="slotProps.secondYear"
+          :first-market="slotProps.firstMarket"
+          :second-market="slotProps.secondMarket"
+          v-slot="slotProps">
           <h2>{{ slotProps.data.category }}</h2>
+          <div>First Year: {{ slotProps.firstYear }}</div>
+          <div>Second Year: {{ slotProps.secondYear }}</div>
+          <div>First Market: {{ slotProps.firstMarket }}</div>
+          <div>Second Market: {{ slotProps.secondMarket }}</div>
           <div class="grid">
             <div>KPI</div>
             <div>Time frame</div>

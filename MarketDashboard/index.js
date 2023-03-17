@@ -6,7 +6,6 @@ app.use(antd)
 // console.log(dayjs)
 
 const domo = window.domo
-domo.onFiltersUpdate(console.log)
 const datasets = window.datasets
 const fields = [
   'Market', 
@@ -29,8 +28,45 @@ const filter = [
 ]*/
 
 // const query = `/data/v1/${datasets[0]}?fields=${fields.join()}&groupby=${groupby.join()}`
-// const query = `/data/v1/${datasets[0]}?fields=${fields.join()}&filter=Value!=''`
-const query = `/data/v1/${datasets[0]}?fields=${fields.join()}&filter=${filter.join()}`
+const query = `/data/v1/${datasets[0]}?fields=${fields.join()}&filter=Value!=''`
+// const query = `/data/v1/${datasets[0]}?fields=${fields.join()}&filter=${filter.join()}`
+
+domo.onFiltersUpdate((filters) => {
+  console.log('onFiltersUpdate')
+	emitter.emit('update-data', {
+     filters
+  })
+})
+
+const mockFilters = [
+    {
+        column: 'Market',
+        operand: 'IN',
+        values: [
+            'Global',
+            'Mexico'
+        ],
+        dataType: 'string',
+        label: 'Market',
+        sourceCardURN: 1349532511,
+        key: 'Market:',
+        dataSourceId: 'f95f720f-fb3d-4f4c-bffd-7bd39e8ab12c'
+    },
+    {
+        column: 'Year',
+        operand: 'IN',
+        values: [
+            '2020',
+            '2021'
+        ],
+        dataType: 'numeric',
+        label: 'Year',
+        sourceCardURN: 1349532511,
+        key: 'Year:',
+        dataSourceId: 'f95f720f-fb3d-4f4c-bffd-7bd39e8ab12c'
+    }
+]
+
 
 const categoryDictionary = {
   "Brand strength": [
@@ -83,8 +119,8 @@ app.component('MarketDashboard', {
   template: `<div>
 							<slot 
 								:data="dataGroupByCategory" 
-								:startYear="startYear"
-								:endYear="endYear"
+								:firstYear="firstYear"
+								:secondYear="secondYear"
 								:firstMarket="firstMarket"
 								:secondMarket="secondMarket"
 								:isShowGrid="isShowGrid"
@@ -97,8 +133,8 @@ app.component('MarketDashboard', {
     return { 
       data: [],
       categoryDictionary,
-      startYear: '',
-      endYear: '',
+      firstYear: '',
+      secondYear: '',
       firstMarket: '',
       secondMarket: '',
       postMessage: '',
@@ -132,7 +168,12 @@ app.component('MarketDashboard', {
     },
     isShowGrid () {
       // return true
-    	return this.startYear && this.endYear && this.firstMarket && this.secondMarket
+    	return this.firstYear && 
+             this.secondYear &&
+        		 this.firstYear !== this.secondYear &&	
+             this.firstMarket &&
+             this.secondMarket &&
+             this.firstMarket !== this.secondMarket
     },
     query () {
       const fields = [
@@ -146,7 +187,7 @@ app.component('MarketDashboard', {
 
       const filter = [
         "Value != ''",
-        `Year in ['${this.startYear}', '${this.endYear}']`,
+        `Year in ['${this.firstYear}', '${this.secondYear}']`,
         `Market in ['${this.firstMarket}', '${this.secondMarket}']`
       ]
 
@@ -156,54 +197,79 @@ app.component('MarketDashboard', {
     }
   },
   created () {
-    this.emitter.on('update-selector', (event) => {
-      // console.log('update-selector', event)
+    //console.log('created')
+    /*this.emitter.on('update-selector', (event) => {
       this[event.selector] = event.value
       this.getData()
+    })*/
+    
+    this.emitter.on('update-data', (event) => {
+      this.updateData(event.filters)
     })
   },
   mounted () {
-    // this.getData()
-    /*domo
-      .get(this.query)
-      .then((data) => {
-    		this.data = data
-      })*/
-    
-    	// window.removeEventListener("message", this.iframeEvent, false)
-      // window.addEventListener("message", this.iframeEvent, false)
+    /*this.emitter.emit('update-data', {
+     filters: mockFilters
+  	})*/
   },
   methods: {
-    iframeEvent(event) {
-      console.log('iframeEvent')
-				//Verify App Domain
-				// if(event.origin !== 'https://www.xyz.com') return;
-				// console.log('data received:  ' + event.data);
-      this.postMessage = 'Post message'
-    },
     async getData () {
       try {
         this.isLoading = true 
+        // const query = `/data/v1/${datasets[0]}?fields=${fields.join()}&filter=Value!=''`
         
-        if (!this.isShowGrid) {
-          const data = await domo.get(this.query) 
-        	this.data = data 
-          this.isLoading = false
-        	console.log('data', this.data)
-      		console.log('dataGroupByCategory', this.dataGroupByCategory);    
-        }
+        //if (!this.isShowGrid) {
+        console.log('query', this.query)
+        const data = await domo.get(this.query) 
+        this.data = data 
+        this.isLoading = false
+        console.log('data', this.data)
+      	console.log('dataGroupByCategory', this.dataGroupByCategory);    
+        //}
       } catch (error) {
       	console.log(error)
         this.isLoading = false
       }
     },
-    groupByProperty 
+    groupByProperty,
+    updateData (filters) {
+    	console.log('updateData:filters', filters)
+      const marketFilter = filters.filter((filter) => filter.column === 'Market')[0]
+      const yearFilter = filters.filter((filter) => filter.column === 'Year')[0]
+      if (marketFilter && yearFilter) {
+        const markets = marketFilter.values
+        const years = yearFilter.values
+        
+        if (markets.length === 2 && years.length === 2) {
+        	this.firstMarket = markets[0]
+        	this.secondMarket = markets[1]
+        	this.firstYear = years[0]
+        	this.secondYear = years[1]
+          this.$nextTick(() => this.getData())
+        }
+      }
+    }
   }
 })
 
 app.component('KpiTable', {
-  template: `<div><slot :data="data"></slot></div>`,
-  props: ['data'],
+  template: `<div>
+							<slot 
+								:data="data"
+								:firstYear="firstYear"
+								:secondYear="secondYear"
+								:firstMarket="firstMarket"
+								:secondMarket="secondMarket"
+							>
+							</slot>
+						</div>`,
+  props: [
+    'data',
+    'firstYear',
+    'secondYear',
+    'firstMarket',
+    'secondMarket'
+  ],
   mounted() {
   	// console.log('mounted KpiTable', this.data)
   }
@@ -231,8 +297,8 @@ app.component('KpiRow', {
           data: data.slice(-2)
         })
 			}
-      console.log('watch:data', data)
-      console.log('dataByMarket', dataByMarket)
+      // console.log('watch:data', data)
+      // console.log('dataByMarket', dataByMarket)
       console.log('groupByMarket', groupByMarket)
       this.dataByMarket = groupByMarket
     }
@@ -248,10 +314,10 @@ app.component('KpiRow', {
 app.component('Selectors', {
   template: `<div>
 							<slot 
-								:startYear="startYear"
-								:endYear="endYear"
-								:handleStartYear="handleStartYear"
-								:handleEndYear="handleEndYear"
+								:firstYear="firstYear"
+								:secondYear="secondYear"
+								:handleFirstYear="handleFirstYear"
+								:handleSecondYear="handleSecondYear"
 								:markets="markets"
 								:firstMarket="firstMarket"
 								:secondMarket="secondMarket"
@@ -263,8 +329,8 @@ app.component('Selectors', {
   props: [],
   data () {
     return { 
-      startYear: '',
-      endYear: '',
+      firstYear: '',
+      secondYear: '',
       markets: [
         { value: 'Mexico', label: 'Mexico' },
         { value: 'Global', label: 'Global' }
@@ -276,26 +342,25 @@ app.component('Selectors', {
   },
   methods: {
     sendMessage() {
-				console.log('Send message')
+				// console.log('Send message')
       	// window.postMessage(JSON.stringify("Post message"), "*")
 			},
-    handleStartYear (date, dateString) {
-    	console.log('handleStartYear', date, dateString)
+    handleFirstYear (date, dateString) {
+    	// console.log('handleFirstYear', date, dateString)
       this.emitter.emit('update-selector', {
-        selector: 'startYear',
+        selector: 'firstYear',
       	value: dateString
       })
-      this.sendMessage()
     },
-    handleEndYear (date, dateString) {
-    	console.log('handleEndYear', date, dateString)
+    handleSecondYear (date, dateString) {
+    	// console.log('handleSecondYear', date, dateString)
       this.emitter.emit('update-selector', {
-        selector: 'endYear',
+        selector: 'secondYear',
       	value: dateString
       })
     },
     handleChangeFirstMarket (market) {
-    	console.log('handleChangeFirstMarket', market)
+    	// console.log('handleChangeFirstMarket', market)
       this.firstMarket = market
       this.emitter.emit('update-selector', {
         selector: 'firstMarket',
@@ -303,7 +368,7 @@ app.component('Selectors', {
       })
     },
     handleChangeSecondMarket (market) {
-    	console.log('handleChangeSecondMarket', market)
+    	// console.log('handleChangeSecondMarket', market)
       this.secondMarket = market
       this.emitter.emit('update-selector', {
         selector: 'secondMarket',
