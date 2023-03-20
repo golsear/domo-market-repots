@@ -10,7 +10,7 @@
 .grid {
 	display: grid;
   color: #767676;
-  grid-template-columns: 30% 10% 40% 10% 10%;
+  grid-template-columns: 30% 50% 10% 10%;
   grid-auto-flow: column;
   font-family: Open Sans, Helvetica Neue, Arial, Helvetica, sans-serif;
   font-size: 12px;
@@ -66,6 +66,10 @@
 
 .grid > div:last-of-type {
 	border-right-width: 0;
+}
+
+.kpi-table {
+	margin-bottom: 40px;
 }
 
 .kpi-title {

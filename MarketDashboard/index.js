@@ -124,7 +124,6 @@ app.component('MarketDashboard', {
 								:firstMarket="firstMarket"
 								:secondMarket="secondMarket"
 								:isShowGrid="isShowGrid"
-								:postMessage="postMessage"
 								:isLoading="isLoading">
 							</slot>
 						</div>`,
@@ -137,7 +136,6 @@ app.component('MarketDashboard', {
       secondYear: '',
       firstMarket: '',
       secondMarket: '',
-      postMessage: '',
       isLoading: false
     }
   },
@@ -219,11 +217,10 @@ app.component('MarketDashboard', {
         // const query = `/data/v1/${datasets[0]}?fields=${fields.join()}&filter=Value!=''`
         
         //if (!this.isShowGrid) {
-        console.log('query', this.query)
         const data = await domo.get(this.query) 
         this.data = data 
         this.isLoading = false
-        console.log('data', this.data)
+        console.log('MarketDashboard: data', this.query, data)
       	console.log('dataGroupByCategory', this.dataGroupByCategory);    
         //}
       } catch (error) {
@@ -253,7 +250,7 @@ app.component('MarketDashboard', {
 })
 
 app.component('KpiTable', {
-  template: `<div>
+  template: `<div class="kpi-table">
 							<slot 
 								:data="data"
 								:firstYear="firstYear"
@@ -277,10 +274,22 @@ app.component('KpiTable', {
 
 app.component('KpiRow', {
   template: `<div>
-							<slot :data="data" :dataByMarket="dataByMarket"> 
+							<slot 
+								:data="data" 
+								:dataByMarket="dataByMarket"
+								:firstYear="firstYear"
+								:secondYear="secondYear"
+								:firstMarket="firstMarket"
+								:secondMarket="secondMarket"> 
 							</slot>
 						</div>`,
-  props: ['data'],
+  props: [
+    'data',
+    'firstYear',
+    'secondYear',
+    'firstMarket',
+    'secondMarket'
+  ],
   data () {
     return { 
       dataByMarket: [],
@@ -341,10 +350,6 @@ app.component('Selectors', {
     }
   },
   methods: {
-    sendMessage() {
-				// console.log('Send message')
-      	// window.postMessage(JSON.stringify("Post message"), "*")
-			},
     handleFirstYear (date, dateString) {
     	// console.log('handleFirstYear', date, dateString)
       this.emitter.emit('update-selector', {
