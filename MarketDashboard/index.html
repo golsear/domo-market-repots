@@ -130,11 +130,12 @@
         <div class="total-value-title total-value-title-static">Static</div>
       </div>
       <template v-for="(dataCategory, index) in slotProps.data" :key="`dataCategory-${index}`">
-        <kpi-table 
+				<kpi-table 
         	:data="dataCategory"
           :first-year="slotProps.firstYear"
           :second-year="slotProps.secondYear"
           :first-market="slotProps.firstMarket"
+          :first-market-kpi-change="slotProps.firstMarketKpiChange"         
           :second-market="slotProps.secondMarket"
           v-slot="slotProps">
           <h2>{{ slotProps.data.category }}</h2>
@@ -160,13 +161,25 @@
               :first-year="slotProps.firstYear"
           		:second-year="slotProps.secondYear"
           		:first-market="slotProps.firstMarket"
-          		:second-market="slotProps.secondMarket"
+              :first-kpi-change="slotProps.firstKpiChange"
+              :first-kpi-change-css="slotProps.firstKpiChangeCss"       
+              :second-market="slotProps.secondMarket"
+              :second-kpi-change="slotProps.secondKpiChange"
+              :second-kpi-change-css="slotProps.secondKpiChangeCss"       
+              :description="slotProps.description"              
               v-slot="slotProps">
               <div class="grid">
-              	<div>{{slotProps.data.kpiCategory }}</div>
+              	<div>
+                  <div class="kpi-title">{{ slotProps.data.kpiCategory }}</div>
+          				<div class="kpi-description">{{ slotProps.description }}</div>
+                </div>
               	<div></div>
-          			<div></div>
-          			<div></div>
+          			<div>
+                	{{ slotProps.firstKpiChangeCss }} {{ slotProps.firstKpiChange }}%
+                </div>
+          			<div>
+                	{{ slotProps.secondKpiChangeCss }} {{ slotProps.secondKpiChange }}%
+                </div>
           		</div>
             </kpi-row>
           </template>

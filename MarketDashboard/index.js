@@ -28,11 +28,12 @@ const filter = [
 ]*/
 
 // const query = `/data/v1/${datasets[0]}?fields=${fields.join()}&groupby=${groupby.join()}`
-const query = `/data/v1/${datasets[0]}?fields=${fields.join()}&filter=Value!=''`
+// const query = `/data/v1/${datasets[0]}?fields=${fields.join()}&filter=Value!=''`
+const query = `/data/v1/${datasets[0]}?fields=${fields.join()}`
 // const query = `/data/v1/${datasets[0]}?fields=${fields.join()}&filter=${filter.join()}`
 
 domo.onFiltersUpdate((filters) => {
-  console.log('onFiltersUpdate')
+  // console.log('onFiltersUpdate')
 	emitter.emit('update-data', {
      filters
   })
@@ -48,7 +49,7 @@ const mockFilters = [
         ],
         dataType: 'string',
         label: 'Market',
-        sourceCardURN: 1349532511,
+        sourceCardURN: 474710820,
         key: 'Market:',
         dataSourceId: 'f95f720f-fb3d-4f4c-bffd-7bd39e8ab12c'
     },
@@ -61,7 +62,7 @@ const mockFilters = [
         ],
         dataType: 'numeric',
         label: 'Year',
-        sourceCardURN: 1349532511,
+        sourceCardURN: 474710820,
         key: 'Year:',
         dataSourceId: 'f95f720f-fb3d-4f4c-bffd-7bd39e8ab12c'
     }
@@ -117,8 +118,8 @@ app.config.globalProperties.emitter = emitter
 
 app.component('MarketDashboard', {
   template: `<div>
-							<slot 
-								:data="dataGroupByCategory" 
+							<slot
+								:data="dataGroupByCategory"
 								:firstYear="firstYear"
 								:secondYear="secondYear"
 								:firstMarket="firstMarket"
@@ -144,7 +145,7 @@ app.component('MarketDashboard', {
       const groupedData = []
       const dataGroupByKPI = this.groupByProperty(this.data, 'KPI')
       
-      // console.log('dataGroupByKPI', dataGroupByKPI)
+      console.log('dataGroupByKPI', dataGroupByKPI)
       
       for (const [category, kpiCategories] of Object.entries(this.categoryDictionary)) {
         const kpis = []
@@ -186,7 +187,7 @@ app.component('MarketDashboard', {
       const filter = [
         "Value != ''",
         `Year in ['${this.firstYear}', '${this.secondYear}']`,
-        `Market in ['${this.firstMarket}', '${this.secondMarket}']`
+        //`Market in ['${this.firstMarket}', '${this.secondMarket}']`
       ]
 
 			const query = `/data/v1/${datasets[0]}?fields=${fields.join()}&filter=${filter.join()}`
@@ -195,12 +196,6 @@ app.component('MarketDashboard', {
     }
   },
   created () {
-    //console.log('created')
-    /*this.emitter.on('update-selector', (event) => {
-      this[event.selector] = event.value
-      this.getData()
-    })*/
-    
     this.emitter.on('update-data', (event) => {
       this.updateData(event.filters)
     })
@@ -214,15 +209,11 @@ app.component('MarketDashboard', {
     async getData () {
       try {
         this.isLoading = true 
-        // const query = `/data/v1/${datasets[0]}?fields=${fields.join()}&filter=Value!=''`
-        
-        //if (!this.isShowGrid) {
         const data = await domo.get(this.query) 
         this.data = data 
         this.isLoading = false
         console.log('MarketDashboard: data', this.query, data)
       	console.log('dataGroupByCategory', this.dataGroupByCategory);    
-        //}
       } catch (error) {
       	console.log(error)
         this.isLoading = false
@@ -251,13 +242,13 @@ app.component('MarketDashboard', {
 
 app.component('KpiTable', {
   template: `<div class="kpi-table">
-							<slot 
+							<slot
 								:data="data"
 								:firstYear="firstYear"
 								:secondYear="secondYear"
 								:firstMarket="firstMarket"
 								:secondMarket="secondMarket"
-							>
+              >
 							</slot>
 						</div>`,
   props: [
@@ -265,7 +256,7 @@ app.component('KpiTable', {
     'firstYear',
     'secondYear',
     'firstMarket',
-    'secondMarket'
+    'secondMarket',
   ],
   mounted() {
   	// console.log('mounted KpiTable', this.data)
@@ -280,7 +271,12 @@ app.component('KpiRow', {
 								:firstYear="firstYear"
 								:secondYear="secondYear"
 								:firstMarket="firstMarket"
-								:secondMarket="secondMarket"> 
+                :firstKpiChange="firstMarketKpiChange"
+                :firstKpiChangeCss="firstMarketKpiChangeCss"  
+								:description="kpiDescription"
+								:secondMarket="secondMarket"
+                :secondKpiChange="secondMarketKpiChange"
+                :secondKpiChangeCss="secondMarketKpiChangeCss"> 
 							</slot>
 						</div>`,
   props: [
@@ -288,101 +284,84 @@ app.component('KpiRow', {
     'firstYear',
     'secondYear',
     'firstMarket',
-    'secondMarket'
+    'secondMarket',
+    'description',
+    'firstKpiChange',
+    'secondKpiChange'
   ],
   data () {
     return { 
       dataByMarket: [],
     }
   },
+  computed: {
+  	firstMarketData () {
+      return this.getMarketData('first')
+    },
+    secondMarketData () {
+    	return this.getMarketData('second')
+    },
+    kpiDescription () {
+    	return this.dataByMarket.length 
+        ? this.dataByMarket[0].data[0].Description : ''
+    },
+    firstMarketKpiChange () {
+      return this.getMarketKpiChange('first')
+    },
+    firstMarketKpiChangeCss () {
+      return this.getMarketKpiChangeCss('first')
+    },
+    secondMarketKpiChange () {
+      return this.getMarketKpiChange('second')
+    },
+    secondMarketKpiChangeCss () {
+      return this.getMarketKpiChangeCss('second')
+    },
+  },
   watch: {
-  	data (data) {
-    	const groupByMarket = data.kpiData ? this.groupByProperty(data.kpiData, 'Market') : []
+    data (data) {
+      const groupByMarket = data.kpiData ? this.groupByProperty(data.kpiData, 'Market') : []
       const dataByMarket = []
       
       for (const [category, data] of Object.entries(groupByMarket)) {
   			dataByMarket.push({
         	category,
-          data: data.slice(-2)
+          // data: data.slice(-2)
+          data: data
         })
 			}
       // console.log('watch:data', data)
-      // console.log('dataByMarket', dataByMarket)
+      console.log('dataByMarket', dataByMarket)
       console.log('groupByMarket', groupByMarket)
-      this.dataByMarket = groupByMarket
+      this.dataByMarket = dataByMarket
     }
   },
   mounted() {
   	// console.log('mounted KpiRow', this.data)
   },
   methods: {
-  	groupByProperty
-  }
-})
-
-app.component('Selectors', {
-  template: `<div>
-							<slot 
-								:firstYear="firstYear"
-								:secondYear="secondYear"
-								:handleFirstYear="handleFirstYear"
-								:handleSecondYear="handleSecondYear"
-								:markets="markets"
-								:firstMarket="firstMarket"
-								:secondMarket="secondMarket"
-								:handleChangeFirstMarket="handleChangeFirstMarket"
-								:handleChangeSecondMarket="handleChangeSecondMarket"
-								:disabledDate="disabledDate">
-              </slot>
-						</div>`,
-  props: [],
-  data () {
-    return { 
-      firstYear: '',
-      secondYear: '',
-      markets: [
-        { value: 'Mexico', label: 'Mexico' },
-        { value: 'Global', label: 'Global' }
-      ],
-      firstMarket: undefined,
-      secondMarket: undefined,
-      allowedYears: ['2021', '2022', '2023']
-    }
-  },
-  methods: {
-    handleFirstYear (date, dateString) {
-    	// console.log('handleFirstYear', date, dateString)
-      this.emitter.emit('update-selector', {
-        selector: 'firstYear',
-      	value: dateString
-      })
+  	groupByProperty,
+    getMarketData (marketKey) {
+      const data = this.dataByMarket.find((market) => market.category === this[`${marketKey}Market`])
+      
+      return data
     },
-    handleSecondYear (date, dateString) {
-    	// console.log('handleSecondYear', date, dateString)
-      this.emitter.emit('update-selector', {
-        selector: 'secondYear',
-      	value: dateString
-      })
+    getMarketKpiChange (marketKey) {
+      const marketData = this[`${marketKey}MarketData`]
+      
+      if (!marketData) {
+      	return ''    
+      }
+      
+      return this.round(((marketData.data[1].Value - marketData.data[0].Value) / marketData.data[0].Value) * 100) 
     },
-    handleChangeFirstMarket (market) {
-    	// console.log('handleChangeFirstMarket', market)
-      this.firstMarket = market
-      this.emitter.emit('update-selector', {
-        selector: 'firstMarket',
-      	value: market
-      })
-    },
-    handleChangeSecondMarket (market) {
-    	// console.log('handleChangeSecondMarket', market)
-      this.secondMarket = market
-      this.emitter.emit('update-selector', {
-        selector: 'secondMarket',
-      	value: market
-      })
-    },
-    disabledDate (current) {
-    	const currentYear =  current.format('YYYY')
-      return !this.allowedYears.includes(currentYear)
+    round(value) {
+    	return Math.sign(value) * Math.round(Math.abs(value))
+		},
+    getMarketKpiChangeCss (marketKey) {
+      const kpiChange = this[`${marketKey}MarketKpiChange`]
+      
+      return Math.sign(kpiChange) === -1 ? 'poor' : 'good'
     }
   }
 })
