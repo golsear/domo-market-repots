@@ -124,7 +124,34 @@
                   <div class="kpi-title">{{ slotProps.data.kpiCategory }}</div>
           				<div class="kpi-description">{{ slotProps.description }}</div>
                 </div>
-              	<div></div>
+              	<div>
+                	<spark-line
+                  	:first-market-data="slotProps.firstMarketData"
+                    :second-market-data="slotProps.secondMarketData"
+                    v-slot="slotProps">
+                    {{ slotProps.firstMarketValue }}
+                    {{ slotProps.secondMarketValue }}
+                    <div class="kpi-line">
+                      <div class="kpi-line-range" style="left: 10%; right: 26%"></div>
+                      <div class="kpi-line-selected-range" style="left: 48%; right: 42%"></div>
+                      <div class="kpi-point kpi-point-min" style="left: 10%;">
+                        <div class="kpi-point-value">10%</div>
+                        <div class="kpi-point-title">Greece</div>
+                      </div>
+                      <div class="kpi-point kpi-point-global" style="left: 48%;">
+                        <div class="kpi-point-value">48%</div>
+                      </div>
+                      <div class="kpi-point kpi-point-selected" style="left: 58%;">
+                        <div class="kpi-point-value">58%</div>
+                      </div>
+
+                      <div class="kpi-point kpi-point-max" style="left: 74%;">
+                        <div class="kpi-point-value">74%</div>
+                        <div class="kpi-point-title">Argentina</div>
+                      </div>
+                    </div>
+                  </spark-line>
+                </div>
                 <div class="align-items-center">
           				<div :class="'kpi-change kpi-change-' + slotProps.firstKpiChangeCss">
                     {{ slotProps.firstKpiChange }}% 

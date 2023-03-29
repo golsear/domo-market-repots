@@ -296,19 +296,16 @@ app.component('KpiTable', {
   },
   created () {
     this.emitter.on(`'update-first-kpi-sum-${this.tableIndex}'`, (event) => {
-      console.log(`'update-first-kpi-sum-${this.tableIndex}'`, event.value)
       this.updateKpiSum('first', event.value) 
     })
     
     this.emitter.on(`'update-second-kpi-sum-${this.tableIndex}'`, (event) => {
-      console.log(`'update-second-kpi-sum-${this.tableIndex}'`, event.value)
       this.updateKpiSum('second', event.value)
     })
   },
   methods: {
   	updateKpiSum (key, value) {
     	this[`${key}KpiSumValue`] += value
-      console.log(`${key}KpiSumValue`, this[`${key}KpiSumValue`])
     },
     getKpiSumCss (marketKey) {
       const kpiSum = this[`${marketKey}KpiSumValue`]
@@ -334,7 +331,9 @@ app.component('KpiRow', {
 								:description="kpiDescription"
 								:secondMarket="secondMarket"
                 :secondKpiChange="secondMarketKpiChange"
-                :secondKpiChangeCss="secondMarketKpiChangeCss"> 
+                :secondKpiChangeCss="secondMarketKpiChangeCss"
+                :firstMarketData="firstMarketData"
+                :secondMarketData="secondMarketData"> 
 							</slot>
 						</div>`,
   props: [
@@ -405,14 +404,10 @@ app.component('KpiRow', {
       this.dataByMarket = dataByMarket
     }
   },
-  mounted() {
-  	// console.log('mounted KpiRow', this.data)
-  },
   methods: {
   	groupByProperty,
     getMarketData (marketKey) {
       const data = this.dataByMarket.find((market) => market.category === this[`${marketKey}Market`])
-      
       return data
     },
     getMarketKpiChange (marketKey) {
@@ -431,6 +426,63 @@ app.component('KpiRow', {
       return  Math.sign(kpiChange) === -1 ? 'poor' 
       : kpiChange <= 5 ? 'static' : 'good'
     }
+  }
+})
+
+app.component('SparkLine', {
+  template: `<div>
+							<slot
+								:firstMarketValue="firstMarketValue"
+                :secondMarketValue="secondMarketValue"> 
+							</slot>
+						</div>`,
+  props: [
+  	'firstMarketData',
+    'secondMarketData'
+  ],
+  data () {
+    return { 
+      
+    }
+  },
+  computed: {
+  	firstMarketValue () {
+      if (this.firstMarketData) {
+        console.log(this.firstMarketData.data[1].Value, this.getValueByType(this.firstMarketData.data[1].Value))
+      	return this.firstMarketData.data[1].Value     
+      }
+      
+      return null
+    },
+    secondMarketValue () {
+      if (this.firstMarketData) {
+      	return this.firstMarketData.data[1].Value     
+      }
+      
+      return null
+    }
+  },
+  watch: {
+    
+  },
+  mounted() {
+  	// console.log('mounted KpiRow', this.data)
+    console.log('spark-line: firstMarketData', this.firstMarketData)
+  },
+  methods: {
+  	getValueByType (val) {
+      
+    	const type = val < 1 ? 'percent' : 'number'
+      const value = type === 'percent' ? Math.round(val * 100) : this.round(val)
+      const offset = type === 'percent' ? value : 0
+      
+      return {
+      	type,
+        value,
+        offset
+      }
+    },
+    round
   }
 })
 
