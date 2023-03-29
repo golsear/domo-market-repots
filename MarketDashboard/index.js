@@ -361,7 +361,8 @@ app.component('KpiRow', {
     getMarketKpiChangeCss (marketKey) {
       const kpiChange = this[`${marketKey}MarketKpiChange`]
       
-      return Math.sign(kpiChange) === -1 ? 'poor' : 'good'
+      return  Math.sign(kpiChange) === -1 ? 'poor' 
+      : kpiChange <= 5 ? 'static' : 'good'
     }
   }
 })

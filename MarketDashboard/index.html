@@ -110,10 +110,10 @@
           </div>
         </div>
         <div class="align-items-center">
-          <div class="kpi-change kpi-change-down">-18% <div class="kpi-change-arrow kpi-change-arrow-down"></div></div> 
+          <div class="kpi-change kpi-change-poor">-18% <div class="kpi-change-arrow kpi-change-arrow-poor"></div></div> 
         </div>
         <div class="align-items-center">
-          <div class="kpi-change kpi-change-up">+18% <div class="kpi-change-arrow kpi-change-arrow-up"></div></div> 
+          <div class="kpi-change kpi-change-good">+18% <div class="kpi-change-arrow kpi-change-arrow-good"></div></div> 
         </div>
       </div>
       <!-- Sum -->
@@ -174,12 +174,18 @@
           				<div class="kpi-description">{{ slotProps.description }}</div>
                 </div>
               	<div></div>
-          			<div>
-                	{{ slotProps.firstKpiChangeCss }} {{ slotProps.firstKpiChange }}%
-                </div>
-          			<div>
-                	{{ slotProps.secondKpiChangeCss }} {{ slotProps.secondKpiChange }}%
-                </div>
+                <div class="align-items-center">
+          				<div :class="'kpi-change kpi-change-' + slotProps.firstKpiChangeCss">
+                    {{ slotProps.firstKpiChange }}% 
+                    <div :class="'kpi-change-arrow kpi-change-arrow-' + slotProps.firstKpiChangeCss"></div>
+                  </div> 
+        				</div>
+        				<div class="align-items-center">
+          				<div :class="'kpi-change kpi-change-' + slotProps.secondKpiChangeCss">
+                    {{ slotProps.secondKpiChange }}% 
+                    <div :class="'kpi-change-arrow kpi-change-arrow-' + slotProps.secondKpiChangeCss"></div>
+                  </div> 
+        				</div>
           		</div>
             </kpi-row>
           </template>
