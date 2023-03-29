@@ -41,7 +41,10 @@
 
 .total-value-poor {
   background: #BA1314;
-  
+}
+
+.total-value-good {
+  background: #1D9464;
 }
 
 .total-value-static {
@@ -55,14 +58,22 @@
 	font-weight: bold;
 }
 
+.total-value-title span:first-letter {
+    text-transform: uppercase;
+}
+
 .total-value-title-poor {
   color: #BA1314;
-  
+}
+
+.total-value-title-good {
+	color: #1D9464;  
 }
 
 .total-value-title-static {
 	color: #d2d2d2;  
 }
+
 
 .grid > div:last-of-type {
 	border-right-width: 0;

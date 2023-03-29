@@ -17,58 +17,7 @@
 
 <div id="app">
   <market-dashboard v-slot="slotProps">
-    <!--
-    <Selectors class="selectors" v-slot="slotProps">
-      <a-row>
-        <a-col :span="24">
-          <div class="flex justify-content-center">
-            <h2>Select two years</h2>
-          </div>
-        </a-col>
-      </a-row>
-      <a-row class="mb-40">
-        <a-col :span="24">
-          <div class="flex justify-content-center">
-            <a-space :size="20">
-              <a-date-picker v-model:value="slotProps.firstYear" picker="year" :disabled-date="slotProps.disabledDate" @change="slotProps.handleFirstYear"></a-date-picker>
-              <a-date-picker v-model:value="slotProps.secondYear" picker="year" :disabled-date="slotProps.disabledDate" @change="slotProps.handleSecondYear"></a-date-picker>
-            </a-space>
-          </div>
-        </a-col>
-      </a-row>
-      <a-row>
-        <a-col :span="24">
-          <div class="flex justify-content-center">
-            <h2>Select two markets</h2>
-          </div>
-        </a-col>
-      </a-row>
-      <a-row>
-        <a-col :span="24">
-          <div class="flex justify-content-center">
-              <a-space :size="20">
-                <a-select
-                  v-model:value="slotProps.firstMarket"
-                  show-search
-                  placeholder="Select a market"
-                  :options="slotProps.markets"
-                  @change="slotProps.handleChangeFirstMarket"
-                ></a-select>
-                <a-select
-                  v-model:value="slotProps.secondMarket"
-                  show-search
-                  placeholder="Select a market"
-                  :options="slotProps.markets"
-                  @change="slotProps.handleChangeSecondMarket"
-                ></a-select>
-            </a-space>
-          </div>
-        </a-col>
-      </a-row>
-    </Selectors>
-		-->
-    
-  	<div v-if="slotProps.isShowGrid">
+    <div v-if="slotProps.isShowGrid">
       <div class="grid">
         <div>KPI</div>
         <div>
@@ -131,7 +80,8 @@
       </div>
       <template v-for="(dataCategory, index) in slotProps.data" :key="`dataCategory-${index}`">
 				<kpi-table 
-        	:data="dataCategory"
+        	:table-index="index"
+          :data="dataCategory"
           :first-year="slotProps.firstYear"
           :second-year="slotProps.secondYear"
           :first-market="slotProps.firstMarket"
@@ -156,7 +106,8 @@
             </div>
           </div>
           <template v-for="(kpi, index) in slotProps.data.kpis" :key="`dataCategory-${index}`">
-            <kpi-row 
+            <kpi-row
+              :table-index="slotProps.tableIndex"       
             	:data="kpi"
               :first-year="slotProps.firstYear"
           		:second-year="slotProps.secondYear"
@@ -193,14 +144,18 @@
           <div class="grid grid-total">
             <div></div>
             <div></div>
-            <div class="total-value total-value-poor">-9%</div>
-            <div class="total-value total-value-static">+4%</div>
+            <div :class="'total-value total-value-' + slotProps.firstKpiSumCss">
+              {{ slotProps.firstKpiSum }}%
+            </div>
+            <div :class="'total-value total-value-' + slotProps.secondKpiSumCss">
+              {{ slotProps.secondKpiSum }}%
+            </div>
           </div>
           <div class="grid grid-total">
             <div></div>
             <div></div>
-            <div class="total-value-title total-value-title-poor">Poor</div>
-            <div class="total-value-title total-value-title-static">Static</div>
+            <div :class="'total-value-title total-value-title-' + slotProps.firstKpiSumCss"><span>{{ slotProps.firstKpiSumCss }}</span></div>
+            <div :class="'total-value-title total-value-title-' + slotProps.secondKpiSumCss"><span>{{ slotProps.secondKpiSumCss }}</span></div>
           </div>
         </kpi-table>
       </template>

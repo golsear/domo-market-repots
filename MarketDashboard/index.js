@@ -105,14 +105,20 @@ const categoryDictionary = {
 }
 
 const groupByProperty = (arr, property) => {
-    	return arr.reduce((memo, x) => {
-    		if (!memo[x[property]]) { 
-          memo[x[property]] = [] 
-        }
-    		memo[x[property]].push(x);
-    		return memo;
-  		}, {});
+	return arr.reduce((memo, x) => {
+  	if (!memo[x[property]]) { 
+    	memo[x[property]] = [] 
     }
+   	
+    memo[x[property]].push(x)
+   	
+    return memo
+  }, {})
+}
+
+const round = (value) => {
+   return Math.sign(value) * Math.round(Math.abs(value))
+}
 
 app.config.globalProperties.emitter = emitter
 
@@ -248,7 +254,11 @@ app.component('KpiTable', {
 								:secondYear="secondYear"
 								:firstMarket="firstMarket"
 								:secondMarket="secondMarket"
-              >
+                :tableIndex="tableIndex"
+								:firstKpiSum="firstKpiSumComputed"
+								:secondKpiSum="secondKpiSumComputed"
+                :firstKpiSumCss="firstKpiSumCssComputed"
+                :secondKpiSumCss="secondKpiSumCssComputed">
 							</slot>
 						</div>`,
   props: [
@@ -257,15 +267,63 @@ app.component('KpiTable', {
     'secondYear',
     'firstMarket',
     'secondMarket',
+    'tableIndex',
+    'firstKpiSum',
+    'secondKpiSum'
   ],
-  mounted() {
-  	// console.log('mounted KpiTable', this.data)
+  data () {
+    return { 
+      firstKpiSumValue: 0,
+      secondKpiSumValue: 0,
+    }
+  },
+  computed: {
+    rows () {
+    	return this.data.kpis.length
+    },
+    firstKpiSumComputed () {
+    	return this.round(this.firstKpiSumValue / this.rows)
+    },
+    secondKpiSumComputed () {
+    	return this.round(this.secondKpiSumValue / this.rows)
+    },
+    firstKpiSumCssComputed () {
+      return this.getKpiSumCss('first')
+    },
+    secondKpiSumCssComputed () {
+      return this.getKpiSumCss('second')
+    },
+  },
+  created () {
+    this.emitter.on(`'update-first-kpi-sum-${this.tableIndex}'`, (event) => {
+      console.log(`'update-first-kpi-sum-${this.tableIndex}'`, event.value)
+      this.updateKpiSum('first', event.value) 
+    })
+    
+    this.emitter.on(`'update-second-kpi-sum-${this.tableIndex}'`, (event) => {
+      console.log(`'update-second-kpi-sum-${this.tableIndex}'`, event.value)
+      this.updateKpiSum('second', event.value)
+    })
+  },
+  methods: {
+  	updateKpiSum (key, value) {
+    	this[`${key}KpiSumValue`] += value
+      console.log(`${key}KpiSumValue`, this[`${key}KpiSumValue`])
+    },
+    getKpiSumCss (marketKey) {
+      const kpiSum = this[`${marketKey}KpiSumValue`]
+      
+      return  Math.sign(kpiSum) === -1 ? 'poor' 
+      : kpiSum <= 5 ? 'static' : 'good'
+    },
+    round
   }
 })
 
 app.component('KpiRow', {
   template: `<div>
 							<slot 
+								:tableIndex="tableIndex"
 								:data="data" 
 								:dataByMarket="dataByMarket"
 								:firstYear="firstYear"
@@ -287,7 +345,8 @@ app.component('KpiRow', {
     'secondMarket',
     'description',
     'firstKpiChange',
-    'secondKpiChange'
+    'secondKpiChange',
+    'tableIndex'
   ],
   data () {
     return { 
@@ -319,6 +378,16 @@ app.component('KpiRow', {
     },
   },
   watch: {
+    firstMarketKpiChange (value) {
+      this.emitter.emit(`'update-first-kpi-sum-${this.tableIndex}'`, {
+     		value
+  		})
+    },
+    secondMarketKpiChange (value) {
+      this.emitter.emit(`'update-second-kpi-sum-${this.tableIndex}'`, {
+     		value
+  		})
+    },
     data (data) {
       const groupByMarket = data.kpiData ? this.groupByProperty(data.kpiData, 'Market') : []
       const dataByMarket = []
@@ -355,9 +424,7 @@ app.component('KpiRow', {
       
       return this.round(((marketData.data[1].Value - marketData.data[0].Value) / marketData.data[0].Value) * 100) 
     },
-    round(value) {
-    	return Math.sign(value) * Math.round(Math.abs(value))
-		},
+    round,
     getMarketKpiChangeCss (marketKey) {
       const kpiChange = this[`${marketKey}MarketKpiChange`]
       
