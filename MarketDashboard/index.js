@@ -207,9 +207,9 @@ app.component('MarketDashboard', {
     })
   },
   mounted () {
-    this.emitter.emit('update-data', {
+    /*this.emitter.emit('update-data', {
      filters: mockFilters
-  	})
+  	})*/
   },
   methods: {
     async getData () {
@@ -334,7 +334,7 @@ app.component('KpiRow', {
                 :secondKpiChangeCss="secondMarketKpiChangeCss"
                 :firstMarketData="firstMarketData"
                 :secondMarketData="secondMarketData"
-								:maxMarketKpiData="mockNearestMaxMarketData"> 
+								:maxMarketKpiData="nearestMaxMarketData"> 
 							</slot>
 						</div>`,
   props: [
@@ -378,6 +378,54 @@ app.component('KpiRow', {
     },
     nearestMaxMarketData () {
       if (this.firstMarketData && this.secondMarketData) {
+        let maxSelectedMarketsValue
+        let dataByExcludedMaxSelectedMarkets
+        
+        console.log('------>>')
+        const firstMarketData = this.firstMarketData
+        const secondMarketData = this.secondMarketData
+        const firstValue = firstMarketData.data[1].Value;
+				const secondValue = secondMarketData.data[1].Value;
+        const dataByMarket = this.dataByMarket
+
+        if (firstValue === secondValue) {
+          console.log('fM == sM')
+          maxSelectedMarketsValue = firstValue;
+          dataByExcludedMaxSelectedMarkets = dataByMarket.filter(obj => obj.category !== firstMarketData.category && obj.category !== secondMarketData.category);
+        } else {
+          if (firstValue > secondValue) {
+            console.log('fM > sM');
+            maxSelectedMarketsValue = firstValue;
+            dataByExcludedMaxSelectedMarkets = dataByMarket.filter(obj => obj.category !== firstMarketData.category);
+          } else {
+            console.log('fM < sM');
+            maxSelectedMarketsValue = secondValue;
+            dataByExcludedMaxSelectedMarkets = dataByMarket.filter(obj => obj.category !== secondMarketData.category);
+          }
+        }
+
+        const allValues = dataByMarket.map((obj) => {
+      		return obj.data[1].Value
+      	})
+        const values = dataByExcludedMaxSelectedMarkets.map((obj) => {
+      		return obj.data[1].Value
+      	})
+        
+        allValues.sort()
+        // maxSelectedMarketsValue = 0.5
+        values.sort()
+        
+        const nearestMaxMarketData = this.getClosestMaxMinMarketValues(dataByExcludedMaxSelectedMarkets, maxSelectedMarketsValue)
+        
+        console.log('allValues', allValues)
+        console.log('values', values)
+        console.log('maxSelectedMarketsValue', maxSelectedMarketsValue)
+        console.log('dataByExcludedMaxSelectedMarkets',dataByExcludedMaxSelectedMarkets)
+        // console.log('maxSelectedMarketsValue', maxSelectedMarketsValue)
+        // console.log('nearestMaxMarketData', nearestMaxMarketData.data[1].Value, nearestMaxMarketData)
+        console.log('nearestMaxMarketData', nearestMaxMarketData)
+        console.log('<<------')
+      /*if (this.firstMarketData && this.secondMarketData) {
         const maxSelectedMarkets =
               this.firstMarketData.data[1].Value === this.secondMarketData.data[1].Value ?
               	[ this.firstMarketData.data[1].Value, this.secondMarketData.data[1].Value ] :
@@ -394,12 +442,7 @@ app.component('KpiRow', {
           //return Math.abs(round((maxSelectedMarkets - obj)*100)) < Math.abs(round((maxSelectedMarkets - acc)*100)) ? obj : acc
           return Math.abs(round((maxSelectedMarketsValue - obj.data[1].Value)*100)) > Math.abs(round((maxSelectedMarketsValue - acc.data[1].Value)*100)) || (Math.abs(round((maxSelectedMarketsValue - obj.data[1].Value)*100)) == Math.abs(round((maxSelectedMarketsValue - acc.data[1].Value)*100))) ? acc : obj
           
-      	})
-        console.log('------>>')
-        console.log('values', values)
-        console.log('maxSelectedMarkets', maxSelectedMarkets)
-        console.log('nearestMaxMarketData', nearestMaxMarketData.data[1].Value, nearestMaxMarketData)
-        console.log('<<------')
+      	})*/
       }            
     	return 10
     },
@@ -484,34 +527,34 @@ app.component('KpiRow', {
           ]
         },
       ]
-      if (this.firstMarketData && this.secondMarketData) {
+      
+      const mockFirstMarketData = mockDataByMarket[0]
+      const mockSecondMarketData = mockDataByMarket[5]
+      
+      if (mockFirstMarketData && mockSecondMarketData) {
         let maxSelectedMarketsValue
         let dataByExcludedMaxSelectedMarkets
         
         console.log('------>>')
-        if (this.firstMarketData.data[1].Value === this.secondMarketData.data[1].Value) {
+        const firstValue = mockFirstMarketData.data[1].Value;
+				const secondValue = mockSecondMarketData.data[1].Value;
+
+        if (firstValue === secondValue) {
           console.log('fM == sM')
-          maxSelectedMarketsValue = this.firstMarketData.data[1].Value || this.secondMarketData.data[1].Value
-          dataByExcludedMaxSelectedMarkets = mockDataByMarket.filter((obj) => {
-          	return obj.category !== this.firstMarketData.category ||
-                   obj.category !== this.secondMarketData.category
-          })
+          maxSelectedMarketsValue = firstValue;
+          dataByExcludedMaxSelectedMarkets = mockDataByMarket.filter(obj => obj.category !== mockFirstMarketData.category && obj.category !== mockSecondMarketData.category);
         } else {
-          if (this.firstMarketData.data[1].Value > this.secondMarketData.data[1].Value) {
-            console.log('fM > sM', this.firstMarketData, this.secondMarketData)
-            maxSelectedMarketsValue = this.firstMarketData.data[1].Value
-            dataByExcludedMaxSelectedMarkets = mockDataByMarket.filter((obj) => {
-          		return obj.category !== this.firstMarketData.category
-          	})
+          if (firstValue > secondValue) {
+            console.log('fM > sM', mockFirstMarketData, mockSecondMarketData);
+            maxSelectedMarketsValue = firstValue;
+            dataByExcludedMaxSelectedMarkets = mockDataByMarket.filter(obj => obj.category !== mockFirstMarketData.category);
           } else {
-            console.log('fM < sM')
-            maxSelectedMarketsValue = this.secondMarketData.data[1].Value 
-            dataByExcludedMaxSelectedMarkets = mockDataByMarket.filter((o) => { 
-          		return o.category !== this.secondMarketData.category
-            })
+            console.log('fM < sM');
+            maxSelectedMarketsValue = secondValue;
+            dataByExcludedMaxSelectedMarkets = mockDataByMarket.filter(obj => obj.category !== mockSecondMarketData.category);
           }
         }
-        
+
         const allValues = mockDataByMarket.map((obj) => {
       		return obj.data[1].Value
       	})
@@ -520,28 +563,17 @@ app.component('KpiRow', {
       	})
         
         allValues.sort()
-        maxSelectedMarketsValue = 0.38
-        const _values = [0.41, 0.29, 0.37, 0.28]
+        // maxSelectedMarketsValue = 0.5
         values.sort()
         
-        const nearestMaxMarketData = dataByExcludedMaxSelectedMarkets.reduce((acc, obj) => {
-          // return Math.abs(round((maxSelectedMarketsValue - obj)*100)) < Math.abs(round((maxSelectedMarkets - acc)*100)) ? obj : acc // MIN
-          return (Math.abs(round((maxSelectedMarketsValue - obj.data[1].Value)*100)) < Math.abs(round((maxSelectedMarketsValue - acc.data[1].Value)*100))) || obj !== acc ? obj : acc // MIN
-          // return (Math.abs(round((maxSelectedMarketsValue - obj.data[1].Value)*100)) > Math.abs(round((maxSelectedMarketsValue - acc.data[1].Value)*100))) || obj == acc ? acc : obj // MAX
-        })
-        
-        /*const nearestMaxMarketData = _values.reduce((acc, obj) => {
-          console.log(acc, obj,round((maxSelectedMarketsValue - obj)*100),
-                     round((maxSelectedMarketsValue - acc)*100))
-          return Math.abs(round((maxSelectedMarketsValue - obj)*100)) > Math.abs(round((maxSelectedMarketsValue - acc)*100)) || obj == acc ? acc : obj // MAX
-        })*/
+        const nearestMaxMarketData = this.getClosestMaxMinMarketValues(dataByExcludedMaxSelectedMarkets, maxSelectedMarketsValue)
         
         console.log('allValues', allValues)
         console.log('values', values)
         console.log('maxSelectedMarketsValue', maxSelectedMarketsValue)
         console.log('dataByExcludedMaxSelectedMarkets',dataByExcludedMaxSelectedMarkets)
         // console.log('maxSelectedMarketsValue', maxSelectedMarketsValue)
-        console.log('nearestMaxMarketData', nearestMaxMarketData.data[1].Value, nearestMaxMarketData)
+        // console.log('nearestMaxMarketData', nearestMaxMarketData.data[1].Value, nearestMaxMarketData)
         console.log('nearestMaxMarketData', nearestMaxMarketData)
         console.log('<<------')
       }            
@@ -577,6 +609,58 @@ app.component('KpiRow', {
     }
   },
   methods: {
+    getClosestMaxMinMarketValues (arr, targetValue) {
+      return arr.reduce((acc, curr) => {
+        // If current object's age is less than the target value
+        if (curr.data[1].Value < targetValue) {
+          // If current object's age is greater than previous object's age and less than target value
+          if (curr.data[1].Value > acc.min.value) {
+            acc.min.data = curr;
+            acc.min.value = curr.data[1].Value
+          }
+        }
+        // If current object's age is greater than the target value
+        else {
+          // If current object's age is less than previous object's age and greater than target value
+          if (curr.data[1].Value < acc.max.value) {
+            acc.max.data = curr;
+            acc.max.value = curr.data[1].Value
+          }
+        }
+        return acc;
+      }, { min: { data: {}, value: -Infinity }, max: { data: {}, value: Infinity } });
+      /* 
+      const myArray = [
+        { name: 'John', age: 0.41 },
+        { name: 'Jane', age: 0.29 },
+        { name: 'Bob', age: 0.37 },
+        { name: 'Mary', age: 0.28 },
+      ];
+
+      const targetValue = 0.30;
+        
+      const result = myArray.reduce((acc, curr) => {
+        // If current object's age is less than the target value
+        if (curr.age < targetValue) {
+          // If current object's age is greater than previous object's age and less than target value
+          if (curr.age > acc.min.age) {
+            acc.min = curr;
+          }
+        }
+        // If current object's age is greater than the target value
+        else {
+          // If current object's age is less than previous object's age and greater than target value
+          if (curr.age < acc.max.age) {
+            acc.max = curr;
+          }
+        }
+        return acc;
+      }, { min: { age: -Infinity }, max: { age: Infinity } });
+
+      console.log('min', result.min); // { name: 'Jane', age: 30 }
+      console.log('max', result.max); // { name: 'Bob', age: 35 }
+      */
+    },
   	groupByProperty,
     getMarketData (marketKey) {
       const data = this.dataByMarket.find((market) => market.category === this[`${marketKey}Market`])
