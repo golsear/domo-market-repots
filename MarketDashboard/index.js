@@ -288,9 +288,9 @@ app.component('MarketDashboard', {
     })
   },
   mounted () {
-    /*this.emitter.emit('update-data', {
+    this.emitter.emit('update-data', {
      filters: mockFilters
-  	})*/
+  	})
   },
   methods: {
     async getData () {
@@ -415,7 +415,7 @@ app.component('KpiRow', {
                 :secondKpiChangeCss="secondMarketKpiChangeCss"
                 :firstMarketData="firstMarketData"
                 :secondMarketData="secondMarketData"
-								:maxMinMarketKpiData="nearestMaxMinMarketData"> 
+								:sparkLineData="sparkLineData"> 
 							</slot>
 						</div>`,
   props: [
@@ -457,7 +457,7 @@ app.component('KpiRow', {
     secondMarketKpiChangeCss () {
       return this.getMarketKpiChangeCss('second')
     },
-    nearestMaxMinMarketData () {
+    sparkLineData () {
       if (this.firstMarketData && this.secondMarketData) {
         let maxSelectedMarketsValue
         let minSelectedMarketsValue
@@ -466,38 +466,46 @@ app.component('KpiRow', {
         const firstValue = firstMarketData.data[1].Value;
 				const secondValue = secondMarketData.data[1].Value;
         const dataByMarket = this.dataByMarket
+        const dataByExcludedSelectedMarkets = dataByMarket.filter(obj => obj.category !== firstMarketData.category && obj.category !== secondMarketData.category)
 
         console.log('------>>')
         if (firstValue === secondValue) {
           console.log('fM == sM')
-          maxSelectedMarketsValue = minSelectedMarketsValue = firstValue;
+          maxSelectedMarketsValue = minSelectedMarketsValue = firstValue
         } else {
           if (firstValue > secondValue) {
             console.log('fM > sM');
-            maxSelectedMarketsValue = firstValue;
-            minSelectedMarketsValue = secondValue;
+            maxSelectedMarketsValue = firstValue
+            minSelectedMarketsValue = secondValue
           } else {
             console.log('fM < sM');
-            maxSelectedMarketsValue = secondValue;
-            minSelectedMarketsValue = firstValue;
+            maxSelectedMarketsValue = secondValue
+            minSelectedMarketsValue = firstValue
           }
         }
 
         const allValues = dataByMarket.map((obj) => {
       		return obj.data[1].Value
       	})
+        const values = dataByExcludedSelectedMarkets.map((obj) => {
+      		return obj.data[1].Value
+      	})
         
         allValues.sort()
+        values.sort()
         // maxSelectedMarketsValue = 0.5
         
-        const nearestMaxMinMarketData = this.getClosestMaxMinMarketValues(dataByMarket, maxSelectedMarketsValue, minSelectedMarketsValue)
+        const closestMinMaxData = this.getClosestMaxMinMarketValues(dataByExcludedSelectedMarkets, maxSelectedMarketsValue, minSelectedMarketsValue)
         
         console.log('allValues', allValues)
+        console.log('values', values)
         console.log('minSelectedMarketsValue', minSelectedMarketsValue)
         console.log('maxSelectedMarketsValue', maxSelectedMarketsValue)
-        console.log('nearestMaxMinMarketData', nearestMaxMinMarketData)
+        console.log('closestMinMaxData', closestMinMaxData)
         console.log('<<------')
-      	return nearestMaxMinMarketData
+      	return { 
+          closestMinMaxData
+        }
       }            
     	return null
     },
@@ -546,7 +554,7 @@ app.component('KpiRow', {
         // values.sort()
         
         // const nearestMaxMarketData = this.getClosestMaxMinMarketValues(dataByExcludedMaxSelectedMarkets, maxSelectedMarketsValue)
-        const nearestMaxMarketData = this.getClosestMaxMinMarketValues(mockDataByMarket, maxSelectedMarketsValue, minSelectedMarketsValue)
+        const closestMinMaxData = this.getClosestMaxMinMarketValues(mockDataByMarket, maxSelectedMarketsValue, minSelectedMarketsValue)
         
         console.log('allValues', allValues)
         // console.log('values', values)
@@ -555,7 +563,7 @@ app.component('KpiRow', {
         // console.log('dataByExcludedMaxSelectedMarkets',dataByExcludedMaxSelectedMarkets)
         // console.log('maxSelectedMarketsValue', maxSelectedMarketsValue)
         // console.log('nearestMaxMarketData', nearestMaxMarketData.data[1].Value, nearestMaxMarketData)
-        console.log('nearestMaxMarketData', nearestMaxMarketData)
+        console.log('closestMinMaxData', closestMinMaxData)
         console.log('<<------')
       }            
     	return 10
@@ -689,13 +697,16 @@ app.component('KpiRow', {
 app.component('SparkLine', {
   template: `<div>
 							<slot
-								:firstMarketValue="firstMarketValue"
-                :secondMarketValue="secondMarketValue"> 
+								:firstMarketPoint="firstMarketPoint"
+                :secondMarketPoint="secondMarketPoint"
+                :maxMarketPoint="maxMarketPoint"
+                :minMarketPoint="minMarketPoint"> 
 							</slot>
 						</div>`,
   props: [
   	'firstMarketData',
-    'secondMarketData'
+    'secondMarketData',
+    'data'
   ],
   data () {
     return { 
@@ -703,17 +714,33 @@ app.component('SparkLine', {
     }
   },
   computed: {
-  	firstMarketValue () {
-      if (this.firstMarketData) {
-        console.log(this.firstMarketData.data[1].Value, this.getValueByType(this.firstMarketData.data[1].Value))
-      	return this.firstMarketData.data[1].Value     
+    maxMarketPoint () {
+    	if (this.data) {
+        console.log('maxMarketPoint', this.data.closestMinMaxData.max)
+        return null
+        // return this.getPoint(this.firstMarketData.data[1])     
       }
       
       return null
     },
-    secondMarketValue () {
+    minMarketPoint () {
+    	if (this.data) {
+        return null
+        // return this.getPoint(this.firstMarketData.data[1])     
+      }
+      
+      return null
+    },
+  	firstMarketPoint () {
       if (this.firstMarketData) {
-      	return this.firstMarketData.data[1].Value     
+        return this.getPoint(this.firstMarketData.data[1])     
+      }
+      
+      return null
+    },
+    secondMarketPoint () {
+      if (this.firstMarketData) {
+      	return this.getPoint(this.secondMarketData.data[1])     
       }
       
       return null
@@ -727,15 +754,18 @@ app.component('SparkLine', {
     console.log('spark-line: firstMarketData', this.firstMarketData)
   },
   methods: {
-  	getValueByType (val) {
-      
-    	const type = val < 1 ? 'percent' : 'number'
-      const value = type === 'percent' ? Math.round(val * 100) : this.round(val)
+  	getPoint (data) {
+      console.log('getPoint', data)
+      const pointValue = data.Value
+      const market = data.Market
+      const type = pointValue < 1 ? 'percent' : 'number'
+      const value = type === 'percent' ? Math.round(pointValue * 100) : this.round(pointValue)
       const offset = type === 'percent' ? value : 0
       
       return {
-      	type,
-        value,
+        market,
+        type,
+      	value,
         offset
       }
     },

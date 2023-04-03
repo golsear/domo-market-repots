@@ -121,10 +121,6 @@
               v-slot="slotProps">
               <div class="grid">
               	<div>
-                  <div>max.closestMin: {{ slotProps.maxMinMarketKpiData?.max.closestMin.value }}</div>
-                  <div>max.closestMax: {{ slotProps.maxMinMarketKpiData?.max.closestMax.value }}</div>
-                  <div>min.closestMin: {{ slotProps.maxMinMarketKpiData?.min.closestMin.value }}</div>
-                  <div>min.closestMax: {{ slotProps.maxMinMarketKpiData?.min.closestMax.value }}</div>
                   <div class="kpi-title">{{ slotProps.data.kpiCategory }}</div>
           				<div class="kpi-description">{{ slotProps.description }}</div>
                 </div>
@@ -132,9 +128,12 @@
                 	<spark-line
                   	:first-market-data="slotProps.firstMarketData"
                     :second-market-data="slotProps.secondMarketData"
+                    :data="slotProps.sparkLineData"          
                     v-slot="slotProps">
-                    {{ slotProps.firstMarketValue }}
-                    {{ slotProps.secondMarketValue }}
+                    <div>firstMarketPoint: {{ slotProps.firstMarketPoint }}</div>
+                    <div>secondMarketPoint: {{ slotProps.secondMarketPoint }}</div>
+                    <div>maxMarketPoint: {{ slotProps.maxMarketPoint }}</div>
+                    <div>minMarketPoint: {{ slotProps.minMarketPoint }}</div>
                     <div class="kpi-line">
                       <div class="kpi-line-range" style="left: 10%; right: 26%"></div>
                       <div class="kpi-line-selected-range" style="left: 48%; right: 42%"></div>
