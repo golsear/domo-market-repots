@@ -121,7 +121,10 @@
               v-slot="slotProps">
               <div class="grid">
               	<div>
-                  <div>maxMarketKpiData: {{ slotProps.maxMarketKpiData }}</div>
+                  <div>max.closestMin: {{ slotProps.maxMinMarketKpiData?.max.closestMin.value }}</div>
+                  <div>max.closestMax: {{ slotProps.maxMinMarketKpiData?.max.closestMax.value }}</div>
+                  <div>min.closestMin: {{ slotProps.maxMinMarketKpiData?.min.closestMin.value }}</div>
+                  <div>min.closestMax: {{ slotProps.maxMinMarketKpiData?.min.closestMax.value }}</div>
                   <div class="kpi-title">{{ slotProps.data.kpiCategory }}</div>
           				<div class="kpi-description">{{ slotProps.description }}</div>
                 </div>
