@@ -288,9 +288,9 @@ app.component('MarketDashboard', {
     })
   },
   mounted () {
-    this.emitter.emit('update-data', {
+    /*this.emitter.emit('update-data', {
      filters: mockFilters
-  	})
+  	})*/
   },
   methods: {
     async getData () {
@@ -504,7 +504,8 @@ app.component('KpiRow', {
         console.log('closestMinMaxData', closestMinMaxData)
         console.log('<<------')
       	return { 
-          closestMinMaxData
+          closestMinMaxData,
+          maxValue: Math.max(...allValues)
         }
       }            
     	return null
@@ -714,19 +715,26 @@ app.component('SparkLine', {
     }
   },
   computed: {
+    maxValue () {
+    	return this.data ? this.data.maxValue : 0
+    },
     maxMarketPoint () {
     	if (this.data) {
-        console.log('maxMarketPoint', this.data.closestMinMaxData.max)
-        return null
-        // return this.getPoint(this.firstMarketData.data[1])     
+        console.log('maxMarketPoint', this.data)
+        const maxPointData = this.data.closestMinMaxData.max
+        return isFinite(maxPointData.closestMax.value) ? 
+          this.getPoint(maxPointData.closestMax.data.data[1]) :
+          this.getPoint(maxPointData.closestMin.data.data[1])
       }
       
       return null
     },
     minMarketPoint () {
     	if (this.data) {
-        return null
-        // return this.getPoint(this.firstMarketData.data[1])     
+        const minPointData = this.data.closestMinMaxData.min
+        return isFinite(minPointData.closestMin.value) ? 
+          this.getPoint(minPointData.closestMin.data.data[1]) :
+          this.getPoint(minPointData.closestMax.data.data[1])
       }
       
       return null
@@ -755,12 +763,13 @@ app.component('SparkLine', {
   },
   methods: {
   	getPoint (data) {
-      console.log('getPoint', data)
-      const pointValue = data.Value
+      console.log('getPoint', this.maxValue, data)
+      const pointValue = data.Value 
       const market = data.Market
       const type = pointValue < 1 ? 'percent' : 'number'
       const value = type === 'percent' ? Math.round(pointValue * 100) : this.round(pointValue)
-      const offset = type === 'percent' ? value : 0
+      const offset = type === 'percent' ? 
+            value : Math.round((value/this.maxValue)*100)
       
       return {
         market,
