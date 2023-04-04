@@ -701,7 +701,8 @@ app.component('SparkLine', {
 								:firstMarketPoint="firstMarketPoint"
                 :secondMarketPoint="secondMarketPoint"
                 :maxMarketPoint="maxMarketPoint"
-                :minMarketPoint="minMarketPoint"> 
+                :minMarketPoint="minMarketPoint"
+                :lineSelectedRangeOffset="lineSelectedRangeOffset"> 
 							</slot>
 						</div>`,
   props: [
@@ -718,9 +719,21 @@ app.component('SparkLine', {
     maxValue () {
     	return this.data ? this.data.maxValue : 0
     },
+    lineSelectedRangeOffset () {
+    	if (this.firstMarketPoint && this.secondMarketPoint) {
+      	return {
+          left: this.firstMarketPoint.offset > this.secondMarketPoint.offset ? this.secondMarketPoint.offset : this.firstMarketPoint.offset, 
+          right: this.firstMarketPoint.offset > this.secondMarketPoint.offset ? 100 - this.firstMarketPoint.offset : 100 - this.secondMarketPoint.offset 
+        }   
+      }
+      
+      return {
+      	left: 0,
+        right: 0
+      }
+    },
     maxMarketPoint () {
     	if (this.data) {
-        console.log('maxMarketPoint', this.data)
         const maxPointData = this.data.closestMinMaxData.max
         return isFinite(maxPointData.closestMax.value) ? 
           this.getPoint(maxPointData.closestMax.data.data[1]) :
@@ -767,14 +780,15 @@ app.component('SparkLine', {
       const pointValue = data.Value 
       const market = data.Market
       const type = pointValue < 1 ? 'percent' : 'number'
-      const value = type === 'percent' ? Math.round(pointValue * 100) : this.round(pointValue)
+      const value = type === 'percent' ? Math.round(pointValue * 100) : Math.round(pointValue)
       const offset = type === 'percent' ? 
             value : Math.round((value/this.maxValue)*100)
+      const displayValue = type === 'percent' ? `${value}%` : value
       
       return {
         market,
         type,
-      	value,
+      	displayValue,
         offset
       }
     },

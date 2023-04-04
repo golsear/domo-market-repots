@@ -133,24 +133,24 @@
                     <div>firstMarketPoint: {{ slotProps.firstMarketPoint }}</div>
                     <div>secondMarketPoint: {{ slotProps.secondMarketPoint }}</div>
                     <div>maxMarketPoint: {{ slotProps.maxMarketPoint }}</div>
-                    <div>minMarketPoint: {{ slotProps.minMarketPoint }}</div>
+                    {{ slotProps.lineSelectedRangeOffset }}<div style="padding-bottom: 50px">minMarketPoint: {{ slotProps.minMarketPoint }}</div>
                     <div class="kpi-line">
                       <div class="kpi-line-range" style="left: 10%; right: 26%"></div>
-                      <div class="kpi-line-selected-range" style="left: 48%; right: 42%"></div>
-                      <div class="kpi-point kpi-point-closest-min-market" style="left: 10%;">
-                        <div class="kpi-point-value">10%</div>
-                        <div class="kpi-point-title">Greece</div>
+                      <div class="kpi-line-selected-range" :style="`left: ${slotProps.lineSelectedRangeOffset.left}%; right: ${slotProps.lineSelectedRangeOffset.right}%`"></div>
+                      <div class="kpi-point kpi-point-closest-min-market" :style="`left: ${slotProps.minMarketPoint?.offset}%;`">
+                        <div class="kpi-point-value">{{ slotProps.minMarketPoint?.displayValue }}</div>
+                        <div class="kpi-point-title">{{ slotProps.minMarketPoint?.market }}</div>
                       </div>
-                      <div class="kpi-point kpi-point-first-market" style="left: 48%;">
-                        <div class="kpi-point-value">48%</div>
+                      <div class="kpi-point kpi-point-first-market" :style="`left: ${slotProps.firstMarketPoint?.offset}%;`">
+                        <div class="kpi-point-value">{{ slotProps.firstMarketPoint?.displayValue }}</div>
                       </div>
-                      <div class="kpi-point kpi-point-second-market" style="left: 58%;">
-                        <div class="kpi-point-value">58%</div>
+                      <div class="kpi-point kpi-point-second-market" :style="`left: ${slotProps.secondMarketPoint?.offset}%;`">
+                        <div class="kpi-point-value">{{ slotProps.secondMarketPoint?.displayValue }}</div>
                       </div>
 
-                      <div class="kpi-point kpi-point-closest-max-market" style="left: 74%;">
-                        <div class="kpi-point-value">74%</div>
-                        <div class="kpi-point-title">Argentina</div>
+                      <div class="kpi-point kpi-point-closest-max-market" :style="`left: ${slotProps.maxMarketPoint?.offset}%;`">
+                        <div class="kpi-point-value">{{ slotProps.maxMarketPoint?.displayValue }}</div>
+                        <div class="kpi-point-title">{{ slotProps.maxMarketPoint?.market }}</div>
                       </div>
                     </div>
                   </spark-line>
