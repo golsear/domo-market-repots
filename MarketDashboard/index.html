@@ -133,9 +133,11 @@
                     <div>firstMarketPoint: {{ slotProps.firstMarketPoint }}</div>
                     <div>secondMarketPoint: {{ slotProps.secondMarketPoint }}</div>
                     <div>maxMarketPoint: {{ slotProps.maxMarketPoint }}</div>
-                    {{ slotProps.lineSelectedRangeOffset }}<div style="padding-bottom: 50px">minMarketPoint: {{ slotProps.minMarketPoint }}</div>
+                    <div>{{ slotProps.lineSelectedRangeOffset }}</div>
+                    <div>{{ slotProps.lineRangeOffset }}</div>
+                    <div style="padding-bottom: 50px">minMarketPoint: {{ slotProps.minMarketPoint }}</div>
                     <div class="kpi-line">
-                      <div class="kpi-line-range" style="left: 10%; right: 26%"></div>
+                      <div class="kpi-line-range" :style="`left: ${slotProps.lineRangeOffset.left}%; right: ${slotProps.lineRangeOffset.right}%`"></div>
                       <div class="kpi-line-selected-range" :style="`left: ${slotProps.lineSelectedRangeOffset.left}%; right: ${slotProps.lineSelectedRangeOffset.right}%`"></div>
                       <div class="kpi-point kpi-point-closest-min-market" :style="`left: ${slotProps.minMarketPoint?.offset}%;`">
                         <div class="kpi-point-value">{{ slotProps.minMarketPoint?.displayValue }}</div>
