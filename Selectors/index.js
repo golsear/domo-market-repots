@@ -10,8 +10,6 @@ domo.onFiltersUpdate((value) => {
 	// console.log('Filters', value)
 })
 
-// console.log(dayjs)
-
 app.component('Selectors', {
   template: `<div>
 							<slot 
@@ -30,43 +28,49 @@ app.component('Selectors', {
   props: [],
   data () {
     return { 
+      markets: [
+        { value: 'Global', label: 'Global' },
+        { value: 'Australia', label: 'Australia' },
+        { value: 'Brazil', label: 'Brazil' },
+        { value: 'Canada', label: 'Canada' },
+        { value: 'China', label: 'China' },
+        { value: 'France', label: 'France' },
+        { value: 'Germany', label: 'Germany' },
+        { value: 'Hong Kong', label: 'Hong Kong' },
+        { value: 'India', label: 'India' },
+        { value: 'Italy', label: 'Italy' },
+        { value: 'Japan', label: 'Japan' },
+        { value: 'Mexico', label: 'Mexico' },
+        { value: 'South Korea', label: 'South Korea' },
+        { value: 'Switzerland', label: 'Switzerland' },
+        { value: 'United Kingdom', label: 'United Kingdom' },
+        { value: 'United States', label: 'United States' },
+      ],
+      firstMarket: 'United Kingdom',
+      secondMarket: 'United States',
+      allowedYears: ['2019', '2020', '2021', '2022', '2023'],
       startYear: dayjs('2021'),
       endYear: dayjs('2022'),
-      markets: [
-        { value: 'Mexico', label: 'Mexico' },
-        { value: 'Global', label: 'Global' }
-      ],
-      firstMarket: 'Global',
-      secondMarket: 'Mexico',
-      allowedYears: ['2021', '2022', '2023']
     }
   },
   mounted () {
   	this.updateFilters()
   },
   methods: {
-    sendMessage() {
-				console.log('Send message')
-      	// window.postMessage(JSON.stringify("Post message"), "*")
-			},
     handleStartYear (date, dateString) {
-    	console.log('handleStartYear', date, dateString)
-      this.startYear = date
+    	this.startYear = date
       this.updateFilters()
     },
     handleEndYear (date, dateString) {
-    	console.log('handleEndYear', date, dateString)
-      this.endYear = date
+    	this.endYear = date
       this.updateFilters()
     },
     handleChangeFirstMarket (market) {
-    	console.log('handleChangeFirstMarket', market)
-      this.firstMarket = market
+    	this.firstMarket = market
       this.updateFilters()
     },
     handleChangeSecondMarket (market) {
-    	console.log('handleChangeSecondMarket', market)
-      this.secondMarket = market
+    	this.secondMarket = market
       this.updateFilters()
     },
     updateFilters () {
@@ -107,9 +111,7 @@ app.component('Selectors', {
           dataType: 'STRING'
         }
       ])
-      
-      console.log('Update filters')
-		},
+    },
     disabledDate (current) {
     	const currentYear =  current.format('YYYY')
       return !this.allowedYears.includes(currentYear)

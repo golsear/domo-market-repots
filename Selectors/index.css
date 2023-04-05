@@ -9,3 +9,15 @@
 .mb-40 {
 	margin-bottom: 40px;
 }
+
+.ant-select {
+	min-width: 200px;
+}
+
+.ant-select-dropdown {
+	top: 30px !important;
+}
+
+.market-select-wrapper {
+	position: relative;
+}

@@ -1,5 +1,5 @@
 <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-<script src="https://unpkg.com/mitt/dist/mitt.umd.js"></script>
+<!--<script src="https://unpkg.com/mitt/dist/mitt.umd.js"></script>-->
 <script src="https://unpkg.com/dayjs/dayjs.min.js"></script>
 <script src="https://unpkg.com/dayjs/plugin/customParseFormat.js"></script>
 <script src="https://unpkg.com/dayjs/plugin/weekday.js"></script>
@@ -43,10 +43,11 @@
         <div class="flex justify-content-center">
             <a-space :size="20">
               <a-select
-                v-model:value="slotProps.firstMarket"
+              	v-model:value="slotProps.firstMarket"
                 show-search
                 placeholder="Select a market"
                 :options="slotProps.markets"
+                :get-popup-container="trigger => trigger.parentNode"        
                 @change="slotProps.handleChangeFirstMarket"
               ></a-select>
               <a-select
@@ -54,6 +55,7 @@
                 show-search
                 placeholder="Select a market"
                 :options="slotProps.markets"
+                :get-popup-container="trigger => trigger.parentNode"        
                 @change="slotProps.handleChangeSecondMarket"
               ></a-select>
           </a-space>
