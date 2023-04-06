@@ -772,6 +772,18 @@ app.component('SparkLine', {
     
   },
   methods: {
+    shortenNumber(num) {
+      if (num >= 1000000000) {
+        return (num / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
+      }
+      if (num >= 1000000) {
+        return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+      }
+      if (num >= 1000) {
+        return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+      }
+      return num;
+    },
   	getPoint (data) {
       // console.log('getPoint', this.maxValue, data)
       const pointValue = data.Value 
@@ -780,7 +792,7 @@ app.component('SparkLine', {
       const value = type === 'percent' ? Math.round(pointValue * 100) : Math.round(pointValue)
       const offset = type === 'percent' ? 
             value : Math.round((value/this.maxValue)*100)
-      const displayValue = type === 'percent' ? `${value}%` : value
+      const displayValue = type === 'percent' ? `${value}%` : this.shortenNumber(value)
       
       return {
         market,
