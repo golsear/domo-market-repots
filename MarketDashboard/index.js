@@ -761,7 +761,7 @@ app.component('SparkLine', {
       return null
     },
     secondMarketPoint () {
-      if (this.firstMarketData) {
+      if (this.secondMarketData) {
       	return this.getPoint(this.secondMarketData.data[1])     
       }
       
