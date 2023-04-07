@@ -54,7 +54,7 @@ app.component('Selectors', {
     }
   },
   mounted () {
-  	this.updateFilters()
+    this.updateFilters()
   },
   methods: {
     handleStartYear (date, dateString) {
@@ -93,24 +93,27 @@ app.component('Selectors', {
           marketFilterValues.push(this.secondMarket)
       }
       
-      domo.filterContainer([
-        {
-          dataSourceId: "f95f720f-fb3d-4f4c-bffd-7bd39e8ab12c",
-          column: 'Year',
-          operand: 'IN',
-          label: 'Year',
-          values: yearFilterValues,
-          dataType: 'STRING'
-        },
-        {
-          dataSourceId: "f95f720f-fb3d-4f4c-bffd-7bd39e8ab12c",
-          column: 'Market',
-          operand: 'IN',
-          label: 'Market',
-          values: marketFilterValues,
-          dataType: 'STRING'
-        }
-      ])
+      if (yearFilterValues.length === 2 && marketFilterValues.length === 2) {
+      	domo.filterContainer([
+          {
+            dataSourceId: "f95f720f-fb3d-4f4c-bffd-7bd39e8ab12c",
+            column: 'Year',
+            operand: 'IN',
+            label: 'Year',
+            values: yearFilterValues,
+            dataType: 'STRING'
+          },
+          {
+            dataSourceId: "f95f720f-fb3d-4f4c-bffd-7bd39e8ab12c",
+            column: 'Market',
+            operand: 'IN',
+            label: 'Market',
+            values: marketFilterValues,
+            dataType: 'STRING'
+          }
+        ])    
+      }
+      
     },
     disabledDate (current) {
     	const currentYear =  current.format('YYYY')
