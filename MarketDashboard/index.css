@@ -7,6 +7,9 @@
   src: url("https://static.rolex.com/Fonts/Rolex/RolexFont/2.1/RolexFont-Regular-WebS.woff2") format("woff2");
 }
 
+[v-cloak] > * { display:none }
+[v-cloak]::before { content: "Compiling…" }
+
 .grid {
 	display: grid;
   color: #767676;
@@ -242,6 +245,9 @@
 	align-items: center;
 }
 
+.flex-direction-column {
+	flex-direction: column;
+}
 
 .mb-40 {
 	margin-bottom: 40px;
@@ -249,5 +255,20 @@
 
 .spin-wrapper .ant-spin {
 	position: absolute;
+}
+
+.is-loading {
+	opacity: 0.6;
+}
+
+.loading {
+  align-items: center;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: 100;
 }
 

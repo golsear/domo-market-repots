@@ -220,7 +220,7 @@ app.component('MarketDashboard', {
       secondYear: '',
       firstMarket: '',
       secondMarket: '',
-      isLoading: false
+      isLoading: false,
     }
   },
   computed: {
@@ -249,8 +249,7 @@ app.component('MarketDashboard', {
       return groupedData
     },
     isShowGrid () {
-      // return true
-    	return this.firstYear && 
+      return this.firstYear && 
              this.secondYear &&
         		 this.firstYear !== this.secondYear &&	
              this.firstMarket &&
@@ -291,16 +290,22 @@ app.component('MarketDashboard', {
   methods: {
     async getData () {
       try {
-        this.isLoading = true 
-        const data = await domo.get(this.query) 
+        this.setIsLoading(true)
+        const data = await domo.get(this.query)
+        this.setIsLoading(false)
         this.data = data 
-        this.isLoading = false
+        
         console.log('MarketDashboard: data', this.query, data)
       	console.log('dataGroupByCategory', this.dataGroupByCategory);    
       } catch (error) {
       	console.log(error)
-        this.isLoading = false
+        this.setIsLoading(false)
       }
+    },
+    setIsLoading (value) {
+      const overflow = value ? 'hidden' : 'auto'
+      this.isLoading = value
+      document.body.style.overflow = overflow
     },
     groupByProperty,
     updateData (filters) {

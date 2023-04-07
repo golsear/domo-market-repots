@@ -2,84 +2,88 @@
 <!-- <script src="https://unpkg.com/vue@latest"></script> --> 
 <script src="https://unpkg.com/mitt/dist/mitt.umd.js"></script>
 
-<div id="app">
+<div id="app" v-cloak>
   <market-dashboard v-slot="slotProps">
-    
-    <div v-if="slotProps.isShowGrid">
+    <div v-if="slotProps.isShowGrid"
+         :class="{ 'is-loading': slotProps.isLoading }">
+      <div v-if="slotProps.isLoading"
+           class="loading">
+      	Loading...
+    	</div>
       <!--
-      <div class="grid">
-        <div>KPI</div>
-        <div>
-          <div><span class="text-selected">Mexico Performance</span> vs highest and lowest market performance</div>
-        </div>
-        <div>
-          <div>Mexico</div> 
-          <div>KPI change</div>
-        </div>
-        <div>
-          <div>Global</div> 
-          <div>KPI change</div>
-        </div>
-      </div>
-      <div class="grid">
-        <div>
-          <div class="kpi-title">Brand awareness: watch category</div>
-          <div class="kpi-description">What are the five luxury watch brands that first come to mind? 'Rolex' was the first brand answered.</div>
-        </div>
-        <div>
-          <div class="kpi-line">
-            <div class="kpi-line-range" style="left: 10%; right: 26%"></div>
-            <div class="kpi-line-selected-range" style="left: 48%; right: 42%"></div>
-            <div class="kpi-point kpi-point-closest-min-market" style="left: 10%;">
-              <div class="kpi-point-value">10%</div>
-              <div class="kpi-point-title">Greece</div>
-            </div>
-            <div class="kpi-point kpi-point-first-market" style="left: 48%;">
-              <div class="kpi-point-value">48%</div>
-            </div>
-            <div class="kpi-point kpi-point-second-market" style="left: 58%;">
-              <div class="kpi-point-value">58%</div>
-            </div>
-
-            <div class="kpi-point kpi-point-closest-max-market" style="left: 74%;">
-              <div class="kpi-point-value">74%</div>
-              <div class="kpi-point-title">Argentina</div>
-            </div>
+        <div class="grid">
+          <div>KPI</div>
+          <div>
+            <div><span class="text-selected">Mexico Performance</span> vs highest and lowest market performance</div>
+          </div>
+          <div>
+            <div>Mexico</div> 
+            <div>KPI change</div>
+          </div>
+          <div>
+            <div>Global</div> 
+            <div>KPI change</div>
           </div>
         </div>
-        <div class="align-items-center">
-          <div class="kpi-change kpi-change-poor">-18% <div class="kpi-change-arrow kpi-change-arrow-poor"></div></div> 
+        <div class="grid">
+          <div>
+            <div class="kpi-title">Brand awareness: watch category</div>
+            <div class="kpi-description">What are the five luxury watch brands that first come to mind? 'Rolex' was the first brand answered.</div>
+          </div>
+          <div>
+            <div class="kpi-line">
+              <div class="kpi-line-range" style="left: 10%; right: 26%"></div>
+              <div class="kpi-line-selected-range" style="left: 48%; right: 42%"></div>
+              <div class="kpi-point kpi-point-closest-min-market" style="left: 10%;">
+                <div class="kpi-point-value">10%</div>
+                <div class="kpi-point-title">Greece</div>
+              </div>
+              <div class="kpi-point kpi-point-first-market" style="left: 48%;">
+                <div class="kpi-point-value">48%</div>
+              </div>
+              <div class="kpi-point kpi-point-second-market" style="left: 58%;">
+                <div class="kpi-point-value">58%</div>
+              </div>
+
+              <div class="kpi-point kpi-point-closest-max-market" style="left: 74%;">
+                <div class="kpi-point-value">74%</div>
+                <div class="kpi-point-title">Argentina</div>
+              </div>
+            </div>
+          </div>
+          <div class="align-items-center">
+            <div class="kpi-change kpi-change-poor">-18% <div class="kpi-change-arrow kpi-change-arrow-poor"></div></div> 
+          </div>
+          <div class="align-items-center">
+            <div class="kpi-change kpi-change-good">+18% <div class="kpi-change-arrow kpi-change-arrow-good"></div></div> 
+          </div>
         </div>
-        <div class="align-items-center">
-          <div class="kpi-change kpi-change-good">+18% <div class="kpi-change-arrow kpi-change-arrow-good"></div></div> 
-        </div>
-      </div>
-			-->
+        -->
       <!-- Sum -->
       <!--
-      <div class="grid grid-total">
-        <div></div>
-        <div></div>
-        <div class="total-value total-value-poor">-9%</div>
-        <div class="total-value total-value-static">+4%</div>
-      </div>
-      <div class="grid grid-total">
-        <div></div>
-        <div></div>
-        <div class="total-value-title total-value-title-poor">Poor</div>
-        <div class="total-value-title total-value-title-static">Static</div>
-      </div>
-      -->
+        <div class="grid grid-total">
+          <div></div>
+          <div></div>
+          <div class="total-value total-value-poor">-9%</div>
+          <div class="total-value total-value-static">+4%</div>
+        </div>
+        <div class="grid grid-total">
+          <div></div>
+          <div></div>
+          <div class="total-value-title total-value-title-poor">Poor</div>
+          <div class="total-value-title total-value-title-static">Static</div>
+        </div>
+        -->
       <template v-for="(dataCategory, index) in slotProps.data" :key="`dataCategory-${index}`">
-				<kpi-table 
-        	:table-index="index"
-          :data="dataCategory"
-          :first-year="slotProps.firstYear"
-          :second-year="slotProps.secondYear"
-          :first-market="slotProps.firstMarket"
-          :first-market-kpi-change="slotProps.firstMarketKpiChange"         
-          :second-market="slotProps.secondMarket"
-          v-slot="slotProps">
+        <kpi-table 
+                   :table-index="index"
+                   :data="dataCategory"
+                   :first-year="slotProps.firstYear"
+                   :second-year="slotProps.secondYear"
+                   :first-market="slotProps.firstMarket"
+                   :first-market-kpi-change="slotProps.firstMarketKpiChange"         
+                   :second-market="slotProps.secondMarket"
+                   v-slot="slotProps">
           <h2>{{ slotProps.data.category }}</h2>
           <div class="grid">
             <div>KPI</div>
@@ -99,29 +103,29 @@
           </div>
           <template v-for="(kpi, index) in slotProps.data.kpis" :key="`dataCategory-${index}`">
             <kpi-row
-              :table-index="slotProps.tableIndex"       
-            	:data="kpi"
-              :first-year="slotProps.firstYear"
-          		:second-year="slotProps.secondYear"
-          		:first-market="slotProps.firstMarket"
-              :first-kpi-change="slotProps.firstKpiChange"
-              :first-kpi-change-css="slotProps.firstKpiChangeCss"       
-              :second-market="slotProps.secondMarket"
-              :second-kpi-change="slotProps.secondKpiChange"
-              :second-kpi-change-css="slotProps.secondKpiChangeCss"       
-              :description="slotProps.description"              
-              v-slot="slotProps">
+                     :table-index="slotProps.tableIndex"       
+                     :data="kpi"
+                     :first-year="slotProps.firstYear"
+                     :second-year="slotProps.secondYear"
+                     :first-market="slotProps.firstMarket"
+                     :first-kpi-change="slotProps.firstKpiChange"
+                     :first-kpi-change-css="slotProps.firstKpiChangeCss"       
+                     :second-market="slotProps.secondMarket"
+                     :second-kpi-change="slotProps.secondKpiChange"
+                     :second-kpi-change-css="slotProps.secondKpiChangeCss"       
+                     :description="slotProps.description"              
+                     v-slot="slotProps">
               <div class="grid">
-              	<div>
+                <div>
                   <div class="kpi-title">{{ slotProps.data.kpiCategory }}</div>
-          				<div class="kpi-description">{{ slotProps.description }}</div>
+                  <div class="kpi-description">{{ slotProps.description }}</div>
                 </div>
-              	<div>
-                	<spark-line
-                  	:first-market-data="slotProps.firstMarketData"
-                    :second-market-data="slotProps.secondMarketData"
-                    :data="slotProps.sparkLineData"          
-                    v-slot="slotProps">
+                <div>
+                  <spark-line
+                              :first-market-data="slotProps.firstMarketData"
+                              :second-market-data="slotProps.secondMarketData"
+                              :data="slotProps.sparkLineData"          
+                              v-slot="slotProps">
                     <div>firstMarketPoint: {{ slotProps.firstMarketPoint }}</div>
                     <div>secondMarketPoint: {{ slotProps.secondMarketPoint }}</div>
                     <div>maxMarketPoint: {{ slotProps.maxMarketPoint }}</div>
@@ -143,7 +147,7 @@
                       <div class="kpi-point kpi-point-second-market" :style="`left: ${slotProps.secondMarketPoint?.offset}%;`">
                         <div class="kpi-point-value">{{ slotProps.secondMarketPoint?.displayValue }}</div>
                       </div>
-											<div v-if="slotProps.maxMarketPoint" 
+                      <div v-if="slotProps.maxMarketPoint" 
                            class="kpi-point kpi-point-closest-max-market" 
                            :style="`left: ${slotProps.maxMarketPoint?.offset}%;`">
                         <div class="kpi-point-value">{{ slotProps.maxMarketPoint?.displayValue }}</div>
@@ -153,18 +157,18 @@
                   </spark-line>
                 </div>
                 <div class="align-items-center">
-          				<div :class="'kpi-change kpi-change-' + slotProps.firstKpiChangeCss">
+                  <div :class="'kpi-change kpi-change-' + slotProps.firstKpiChangeCss">
                     {{ slotProps.firstKpiChange }}% 
                     <div :class="'kpi-change-arrow kpi-change-arrow-' + slotProps.firstKpiChangeCss"></div>
                   </div> 
-        				</div>
-        				<div class="align-items-center">
-          				<div :class="'kpi-change kpi-change-' + slotProps.secondKpiChangeCss">
+                </div>
+                <div class="align-items-center">
+                  <div :class="'kpi-change kpi-change-' + slotProps.secondKpiChangeCss">
                     {{ slotProps.secondKpiChange }}% 
                     <div :class="'kpi-change-arrow kpi-change-arrow-' + slotProps.secondKpiChangeCss"></div>
                   </div> 
-        				</div>
-          		</div>
+                </div>
+              </div>
             </kpi-row>
           </template>
           <!-- Sum -->
@@ -187,8 +191,8 @@
         </kpi-table>
       </template>
     </div>
-    <div v-else>
-      <div>Loading...</div>
+    <div v-else 
+         class="flex align-items-center flex-direction-column">
       <div>Please select the markets and years.</div>
     </div>
   </market-dashboard>
