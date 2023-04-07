@@ -459,7 +459,10 @@ app.component('KpiRow', {
       return this.getMarketKpiChangeCss('second')
     },
     sparkLineData () {
-      if (this.firstMarketData && this.secondMarketData) {
+      if (this.firstMarketData && 
+          this.secondMarketData &&
+          this.firstMarketData.data.length === 2 &&
+          this.secondMarketData.data.length === 2) {
         let maxSelectedMarketsValue
         let minSelectedMarketsValue
         const firstMarketData = this.firstMarketData
@@ -644,8 +647,9 @@ app.component('KpiRow', {
     },
     getMarketKpiChange (marketKey) {
       const marketData = this[`${marketKey}MarketData`]
+      console.log('getMarketKpiChange: marketData', marketData)
       
-      if (!marketData) {
+      if (!marketData || marketData.data.length < 2) {
       	return ''    
       }
       
@@ -740,9 +744,9 @@ app.component('SparkLine', {
         const maxPointData = this.data.closestMinMaxData.max
         return isFinite(maxPointData.closestMax.value) ? 
           this.getPoint(maxPointData.closestMax.data.data[1]) :
-          	isFinite(maxPointData.closestMin.value) ? 
+          	(isFinite(maxPointData.closestMin.value) ? 
           		this.getPoint(maxPointData.closestMin.data.data[1]) :
-        			null
+        			null)
       }
       
       return null
@@ -752,22 +756,22 @@ app.component('SparkLine', {
         const minPointData = this.data.closestMinMaxData.min
         return isFinite(minPointData.closestMin.value) ? 
           this.getPoint(minPointData.closestMin.data.data[1]) :
-          	isFinite(minPointData.closestMax.value) ? 
+          	(isFinite(minPointData.closestMax.value) ? 
             	this.getPoint(minPointData.closestMax.data.data[1]) :
-        			null
+        			null)
       }
       
       return null
     },
   	firstMarketPoint () {
-      if (this.firstMarketData) {
-        return this.getPoint(this.firstMarketData.data[1])     
+      if (this.firstMarketData && this.firstMarketData.data.length === 2) {
+        return this.getPoint(this.firstMarketData.data[1])    
       }
       
       return null
     },
     secondMarketPoint () {
-      if (this.secondMarketData) {
+      if (this.secondMarketData && this.secondMarketData.data.length === 2) {
       	return this.getPoint(this.secondMarketData.data[1])     
       }
       
@@ -791,7 +795,10 @@ app.component('SparkLine', {
       return num;
     },
   	getPoint (data) {
-      // console.log('getPoint', this.maxValue, data)
+      console.log('getPoint: data', data)
+      if (!data) {
+        return null
+      }
       const pointValue = data.Value 
       const market = data.Market
       const type = pointValue < 1 ? 'percent' : 'number'
