@@ -496,6 +496,7 @@ app.component('KpiRow', {
         
         console.log('allValues', allValues)
         console.log('values', values)
+        console.log('max value', Math.max(...allValues))
         console.log('minSelectedMarketsValue', minSelectedMarketsValue)
         console.log('maxSelectedMarketsValue', maxSelectedMarketsValue)
         console.log('closestMinMaxData', closestMinMaxData)
@@ -738,7 +739,9 @@ app.component('SparkLine', {
         const maxPointData = this.data.closestMinMaxData.max
         return isFinite(maxPointData.closestMax.value) ? 
           this.getPoint(maxPointData.closestMax.data.data[1]) :
-          this.getPoint(maxPointData.closestMin.data.data[1])
+          	isFinite(maxPointData.closestMin.value) ? 
+          		this.getPoint(maxPointData.closestMin.data.data[1]) :
+        			null
       }
       
       return null
@@ -748,7 +751,9 @@ app.component('SparkLine', {
         const minPointData = this.data.closestMinMaxData.min
         return isFinite(minPointData.closestMin.value) ? 
           this.getPoint(minPointData.closestMin.data.data[1]) :
-          this.getPoint(minPointData.closestMax.data.data[1])
+          	isFinite(minPointData.closestMax.value) ? 
+            	this.getPoint(minPointData.closestMax.data.data[1]) :
+        			null
       }
       
       return null

@@ -139,7 +139,9 @@
                     <div class="kpi-line">
                       <div class="kpi-line-range" :style="`left: ${slotProps.lineRangeOffset.left}%; right: ${slotProps.lineRangeOffset.right}%`"></div>
                       <div class="kpi-line-selected-range" :style="`left: ${slotProps.lineSelectedRangeOffset.left}%; right: ${slotProps.lineSelectedRangeOffset.right}%`"></div>
-                      <div class="kpi-point kpi-point-closest-min-market" :style="`left: ${slotProps.minMarketPoint?.offset}%;`">
+                      <div v-if="slotProps.minMarketPoint" 
+                           class="kpi-point kpi-point-closest-min-market" 
+                           :style="`left: ${slotProps.minMarketPoint?.offset}%;`">
                         <div class="kpi-point-value">{{ slotProps.minMarketPoint?.displayValue }}</div>
                         <div class="kpi-point-title">{{ slotProps.minMarketPoint?.market }}</div>
                       </div>
@@ -149,8 +151,9 @@
                       <div class="kpi-point kpi-point-second-market" :style="`left: ${slotProps.secondMarketPoint?.offset}%;`">
                         <div class="kpi-point-value">{{ slotProps.secondMarketPoint?.displayValue }}</div>
                       </div>
-
-                      <div class="kpi-point kpi-point-closest-max-market" :style="`left: ${slotProps.maxMarketPoint?.offset}%;`">
+											<div v-if="slotProps.maxMarketPoint" 
+                           class="kpi-point kpi-point-closest-max-market" 
+                           :style="`left: ${slotProps.maxMarketPoint?.offset}%;`">
                         <div class="kpi-point-value">{{ slotProps.maxMarketPoint?.displayValue }}</div>
                         <div class="kpi-point-title">{{ slotProps.maxMarketPoint?.market }}</div>
                       </div>
