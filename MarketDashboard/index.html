@@ -2,22 +2,11 @@
 <!-- <script src="https://unpkg.com/vue@latest"></script> --> 
 <script src="https://unpkg.com/mitt/dist/mitt.umd.js"></script>
 
-<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-<script src="https://unpkg.com/mitt/dist/mitt.umd.js"></script>
-<script src="https://unpkg.com/dayjs/dayjs.min.js"></script>
-<script src="https://unpkg.com/dayjs/plugin/customParseFormat.js"></script>
-<script src="https://unpkg.com/dayjs/plugin/weekday.js"></script>
-<script src="https://unpkg.com/dayjs/plugin/localeData.js"></script>
-<script src="https://unpkg.com/dayjs/plugin/weekOfYear.js"></script>
-<script src="https://unpkg.com/dayjs/plugin/weekYear.js"></script>
-<script src="https://unpkg.com/dayjs/plugin/advancedFormat.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/ant-design-vue/dist/antd.min.js"></script>
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ant-design-vue@3.2.15/dist/antd.min.css">
-
 <div id="app">
   <market-dashboard v-slot="slotProps">
+    
     <div v-if="slotProps.isShowGrid">
+      <!--
       <div class="grid">
         <div>KPI</div>
         <div>
@@ -65,7 +54,9 @@
           <div class="kpi-change kpi-change-good">+18% <div class="kpi-change-arrow kpi-change-arrow-good"></div></div> 
         </div>
       </div>
+			-->
       <!-- Sum -->
+      <!--
       <div class="grid grid-total">
         <div></div>
         <div></div>
@@ -78,6 +69,7 @@
         <div class="total-value-title total-value-title-poor">Poor</div>
         <div class="total-value-title total-value-title-static">Static</div>
       </div>
+      -->
       <template v-for="(dataCategory, index) in slotProps.data" :key="`dataCategory-${index}`">
 				<kpi-table 
         	:table-index="index"
@@ -196,14 +188,8 @@
       </template>
     </div>
     <div v-else>
-      <a-row>
-        <a-col :span="24">
-          <div class="spin-wrapper align-items-center flex justify-content-center">
-            <a-spin size="large" v-if="slotProps.isLoading"></a-spin>
-            Please select the markets and years.
-          </div>
-        </a-col>
-      </a-row>
+      <div>Loading...</div>
+      <div>Please select the markets and years.</div>
     </div>
   </market-dashboard>
 </div>

@@ -1,10 +1,6 @@
-
 const { createApp } = Vue
 const emitter = mitt()
 const app = createApp()
-app.use(antd)
-// console.log(dayjs)
-
 const domo = window.domo
 const datasets = window.datasets
 const fields = [
