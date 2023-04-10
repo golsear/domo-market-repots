@@ -145,7 +145,6 @@ const mockDataByMarket = [
   },
 ]
 
-
 const categoryDictionary = {
   "Brand strength": [
     "Brand awareness (Watch category)",
@@ -196,6 +195,8 @@ const groupByProperty = (arr, property) => {
 const round = (value) => {
    return Math.sign(value) * Math.round(Math.abs(value))
 }
+
+const mockupMode = false
 
 app.config.globalProperties.emitter = emitter
 
@@ -283,9 +284,11 @@ app.component('MarketDashboard', {
     })
   },
   mounted () {
-    /*this.emitter.emit('update-data', {
-     filters: mockFilters
-  	})*/
+    if (mockupMode) {
+    	this.emitter.emit('update-data', {
+     		filters: mockFilters
+  		})
+    }
   },
   methods: {
     async getData () {
@@ -432,7 +435,7 @@ app.component('KpiRow', {
   ],
   data () {
     return { 
-      dataByMarket: [],
+      dataByMarket: []
     }
   },
   computed: {
@@ -459,6 +462,10 @@ app.component('KpiRow', {
       return this.getMarketKpiChangeCss('second')
     },
     sparkLineData () {
+      if (mockupMode) {
+          return this.mockSparkLineData
+      }
+      
       if (this.firstMarketData && 
           this.secondMarketData &&
           this.firstMarketData.data.length === 2 &&
@@ -513,7 +520,7 @@ app.component('KpiRow', {
     	return null
     },
     // Mockup data for developing
-    sparkLineData_ () {
+    mockSparkLineData () {
       const mockFirstMarketData = mockDataByMarket[0]
       const mockSecondMarketData = mockDataByMarket[5]
       
@@ -594,7 +601,7 @@ app.component('KpiRow', {
 			}
       console.log('dataByMarket', dataByMarket)
       console.log('groupByMarket', groupByMarket)
-      this.dataByMarket = dataByMarket
+      this.dataByMarket = mockupMode ? mockDataByMarket : dataByMarket
     }
   },
   methods: {
