@@ -512,64 +512,63 @@ app.component('KpiRow', {
       }            
     	return null
     },
-    mockNearestMaxMarketData () {
+    // Mockup data for developing
+    sparkLineData_ () {
       const mockFirstMarketData = mockDataByMarket[0]
       const mockSecondMarketData = mockDataByMarket[5]
       
-      if (mockFirstMarketData && mockSecondMarketData) {
+      if (mockFirstMarketData && 
+          mockSecondMarketData &&
+          mockFirstMarketData.data.length === 2 &&
+          mockSecondMarketData.data.length === 2) {
         let maxSelectedMarketsValue
         let minSelectedMarketsValue
-        let dataByExcludedMaxSelectedMarkets
-        
-        console.log('------>>')
-        const firstValue = mockFirstMarketData.data[1].Value;
-				const secondValue = mockSecondMarketData.data[1].Value;
+        const firstMarketData = mockFirstMarketData
+        const secondMarketData = mockSecondMarketData
+        const firstValue = firstMarketData.data[1].Value;
+				const secondValue = secondMarketData.data[1].Value;
+        const dataByMarket = mockDataByMarket
+        const dataByExcludedSelectedMarkets = dataByMarket.filter(obj => obj.category !== firstMarketData.category && obj.category !== secondMarketData.category)
 
+        console.log('=== >>> ===')
         if (firstValue === secondValue) {
-          console.log('fM == sM')
-          maxSelectedMarketsValue = minSelectedMarketsValue = firstValue;
-          
-          // dataByExcludedMaxSelectedMarkets = mockDataByMarket.filter(obj => obj.category !== mockFirstMarketData.category && obj.category !== mockSecondMarketData.category);
+          maxSelectedMarketsValue = minSelectedMarketsValue = firstValue
         } else {
           if (firstValue > secondValue) {
-            console.log('fM > sM', mockFirstMarketData, mockSecondMarketData);
-            maxSelectedMarketsValue = firstValue;
-            minSelectedMarketsValue = secondValue;
-            // dataByExcludedMaxSelectedMarkets = mockDataByMarket.filter(obj => obj.category !== mockFirstMarketData.category);
+            maxSelectedMarketsValue = firstValue
+            minSelectedMarketsValue = secondValue
           } else {
-            console.log('fM < sM');
-            maxSelectedMarketsValue = secondValue;
-            minSelectedMarketsValue = firstValue;
-            // dataByExcludedMaxSelectedMarkets = mockDataByMarket.filter(obj => obj.category !== mockSecondMarketData.category);
+            maxSelectedMarketsValue = secondValue
+            minSelectedMarketsValue = firstValue
           }
         }
 
-        const allValues = mockDataByMarket.map((obj) => {
+        const allValues = dataByMarket.map((obj) => {
       		return obj.data[1].Value
       	})
-        /* const values = dataByExcludedMaxSelectedMarkets.map((obj) => {
+        const values = dataByExcludedSelectedMarkets.map((obj) => {
       		return obj.data[1].Value
-      	}) */
+      	})
         
         allValues.sort()
-        // maxSelectedMarketsValue = 0.59
-        // minSelectedMarketsValue = 0.24
-        // values.sort()
+        values.sort()
+        // maxSelectedMarketsValue = 0.5
         
-        // const nearestMaxMarketData = this.getClosestMaxMinMarketValues(dataByExcludedMaxSelectedMarkets, maxSelectedMarketsValue)
-        const closestMinMaxData = this.getClosestMaxMinMarketValues(mockDataByMarket, maxSelectedMarketsValue, minSelectedMarketsValue)
+        const closestMinMaxData = this.getClosestMaxMinMarketValues(dataByExcludedSelectedMarkets, maxSelectedMarketsValue, minSelectedMarketsValue)
         
         console.log('allValues', allValues)
-        // console.log('values', values)
-        console.log('maxSelectedMarketsValue', maxSelectedMarketsValue)
+        console.log('values', values)
+        console.log('max value', Math.max(...allValues))
         console.log('minSelectedMarketsValue', minSelectedMarketsValue)
-        console.log('dataByExcludedMaxSelectedMarkets',dataByExcludedMaxSelectedMarkets)
-        // console.log('maxSelectedMarketsValue', maxSelectedMarketsValue)
-        // console.log('nearestMaxMarketData', nearestMaxMarketData.data[1].Value, nearestMaxMarketData)
+        console.log('maxSelectedMarketsValue', maxSelectedMarketsValue)
         console.log('closestMinMaxData', closestMinMaxData)
-        console.log('<<------')
+        console.log('=== <<< ===')
+      	return { 
+          closestMinMaxData,
+          maxValue: Math.max(...allValues)
+        }
       }            
-    	return 10
+    	return null
     },
   },
   watch: {
