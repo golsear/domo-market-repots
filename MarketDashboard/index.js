@@ -3,6 +3,9 @@ const emitter = mitt()
 const app = createApp()
 const domo = window.domo
 const datasets = window.datasets
+
+const mockupMode = false
+
 const fields = [
   'Market', 
   'KPI', 
@@ -70,11 +73,13 @@ const mockDataByMarket = [
     data: [
       {
         Value: 0.28,
-        Year: 2020
+        Year: 2020,
+        Market: 'United Kingdom' 
       },
       {
-        Value: 0.41,
-        Year: 2021
+        Value: 0.1,
+        Year: 2021,
+        Market: 'United Kingdom' 
       }
     ]
   },
@@ -83,11 +88,13 @@ const mockDataByMarket = [
     data: [
       {
         Value: 0.21,
-        Year: 2020
+        Year: 2020,
+        Market: 'Argentina' 
       },
       {
-        Value: 0.59,
-        Year: 2021
+        Value: 0.8,
+        Year: 2021,
+        Market: 'Argentina'
       }
     ]
   },
@@ -96,11 +103,13 @@ const mockDataByMarket = [
     data: [
       {
         Value: 0.33,
-        Year: 2020
+        Year: 2020,
+        Market: 'Mexico'
       },
       {
-        Value: 0.37,
-        Year: 2021
+        Value: 0.5,
+        Year: 2021,
+        Market: 'Mexico'
       }
     ]
   },
@@ -109,11 +118,13 @@ const mockDataByMarket = [
     data: [
       {
         Value: 0.45,
-        Year: 2020
+        Year: 2020,
+        Market: 'United States'
       },
       {
-        Value: 0.28,
-        Year: 2021
+        Value: 0.2,
+        Year: 2021,
+        Market: 'United States'
       }
     ]
   },
@@ -122,11 +133,13 @@ const mockDataByMarket = [
     data: [
       {
         Value: 0.48,
-        Year: 2020
+        Year: 2020,
+        Market: 'Global'
       },
       {
-        Value: 0.24,
-        Year: 2021
+        Value: 0.6,
+        Year: 2021,
+        Market: 'Global'
       }
     ]
   },
@@ -135,11 +148,13 @@ const mockDataByMarket = [
     data: [
       {
         Value: 0.33,
-        Year: 2020
+        Year: 2020,
+        Market: 'Mexico2'
       },
       {
         Value: 0.37,
-        Year: 2021
+        Year: 2021,
+        Market: 'Mexico2'
       }
     ]
   },
@@ -195,8 +210,6 @@ const groupByProperty = (arr, property) => {
 const round = (value) => {
    return Math.sign(value) * Math.round(Math.abs(value))
 }
-
-const mockupMode = false
 
 app.config.globalProperties.emitter = emitter
 
@@ -521,8 +534,8 @@ app.component('KpiRow', {
     },
     // Mockup data for developing
     mockSparkLineData () {
-      const mockFirstMarketData = mockDataByMarket[0]
-      const mockSecondMarketData = mockDataByMarket[5]
+      const mockFirstMarketData = mockDataByMarket[4]
+      const mockSecondMarketData = mockDataByMarket[2]
       
       if (mockFirstMarketData && 
           mockSecondMarketData &&
@@ -537,7 +550,7 @@ app.component('KpiRow', {
         const dataByMarket = mockDataByMarket
         const dataByExcludedSelectedMarkets = dataByMarket.filter(obj => obj.category !== firstMarketData.category && obj.category !== secondMarketData.category)
 
-        console.log('=== >>> ===')
+        console.log('=== >>> ===', firstValue, secondValue)
         if (firstValue === secondValue) {
           maxSelectedMarketsValue = minSelectedMarketsValue = firstValue
         } else {
@@ -679,7 +692,8 @@ app.component('SparkLine', {
                 :maxMarketPoint="maxMarketPoint"
                 :minMarketPoint="minMarketPoint"
                 :lineRangeOffset="lineRangeOffset" 
-                :lineSelectedRangeOffset="lineSelectedRangeOffset"> 
+                :lineSelectedRangeOffset="lineSelectedRangeOffset"
+								:setElement="setElement"> 
 							</slot>
 						</div>`,
   props: [
@@ -689,7 +703,10 @@ app.component('SparkLine', {
   ],
   data () {
     return { 
-      
+    	maxMarketPointRef: null,
+      minMarketPointRef: null,
+      firstMarketPointRef: null,
+      secondMarketPointRef: null
     }
   },
   computed: {
@@ -749,9 +766,9 @@ app.component('SparkLine', {
     	if (this.data) {
         const maxPointData = this.data.closestMinMaxData.max
         return isFinite(maxPointData.closestMax.value) ? 
-          this.getPoint(maxPointData.closestMax.data.data[1]) :
+          this.getPoint(maxPointData.closestMax.data.data[1], 'maxMarketPoint') :
           	(isFinite(maxPointData.closestMin.value) ? 
-          		this.getPoint(maxPointData.closestMin.data.data[1]) :
+          		this.getPoint(maxPointData.closestMin.data.data[1], 'maxMarketPoint') :
         			null)
       }
       
@@ -761,9 +778,9 @@ app.component('SparkLine', {
     	if (this.data) {
         const minPointData = this.data.closestMinMaxData.min
         return isFinite(minPointData.closestMin.value) ? 
-          this.getPoint(minPointData.closestMin.data.data[1]) :
+          this.getPoint(minPointData.closestMin.data.data[1], 'minMarketPoint') :
           	(isFinite(minPointData.closestMax.value) ? 
-            	this.getPoint(minPointData.closestMax.data.data[1]) :
+            	this.getPoint(minPointData.closestMax.data.data[1], 'minMarketPoint') :
         			null)
       }
       
@@ -771,23 +788,23 @@ app.component('SparkLine', {
     },
   	firstMarketPoint () {
       if (this.firstMarketData && this.firstMarketData.data.length === 2) {
-        return this.getPoint(this.firstMarketData.data[1])    
+        return this.getPoint(this.firstMarketData.data[1], 'firstMarketPoint')    
       }
       
       return null
     },
     secondMarketPoint () {
       if (this.secondMarketData && this.secondMarketData.data.length === 2) {
-      	return this.getPoint(this.secondMarketData.data[1])     
+      	return this.getPoint(this.secondMarketData.data[1], 'secondMarketPoint')     
       }
       
       return null
     }
   },
-  watch: {
-    
-  },
   methods: {
+    setElement (el, key) {
+      this[`${key}Ref`] = el
+    },
     shortenNumber(num) {
       if (num >= 1000000000) {
         return (num / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
@@ -800,11 +817,14 @@ app.component('SparkLine', {
       }
       return num;
     },
-  	getPoint (data) {
+  	getPoint (data, point) {
       console.log('getPoint: data', data)
       if (!data) {
         return null
       }
+      const el = this[`${point}Ref`]
+      
+      console.log('EL', point, el?.getBoundingClientRect())
       const pointValue = data.Value 
       const market = data.Market
       const type = pointValue < 1 ? 'percent' : 'number'
@@ -814,6 +834,8 @@ app.component('SparkLine', {
       const displayValue = type === 'percent' ? `${value}%` : this.shortenNumber(value)
       
       return {
+        point,
+        el,
         market,
         type,
       	displayValue,

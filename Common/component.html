@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      #chart {
+        width: 600px;
+        height: 400px;
+        border: 1px solid black;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="chart"></div>
+
+    <script>
+      // Sample data for the chart
+      const data = [
+        { x: 0, y: 5, label: "Label 1" },
+        { x: 1, y: 10, label: "Label 2" },
+        { x: 2, y: 15, label: "Label 3" },
+        { x: 3, y: 20, label: "Label 4" },
+      ];
+
+      // Create the chart
+      const chart = document.getElementById("chart");
+      chart.style.position = "relative";
+
+      // Set the dimensions of the chart
+      const width = chart.offsetWidth;
+      const height = chart.offsetHeight;
+
+      // Create the SVG element
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("width", width);
+      svg.setAttribute("height", height);
+      chart.appendChild(svg);
+
+      // Create the x-axis
+      const xAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      xAxis.setAttribute("x1", 0);
+      xAxis.setAttribute("y1", height - 50);
+      xAxis.setAttribute("x2", width);
+      xAxis.setAttribute("y2", height - 50);
+      xAxis.setAttribute("stroke", "black");
+      svg.appendChild(xAxis);
+
+      // Add the data points to the chart
+      data.forEach((d) => {
+        // Create the circle element
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("cx", (d.x / 3) * width);
+        circle.setAttribute("cy", height - 50 - (d.y / 20) * (height - 100));
+        circle.setAttribute("r", 5);
+        circle.setAttribute("fill", "blue");
+        svg.appendChild(circle);
+
+        // Create the label element
+        const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        label.setAttribute("x", (d.x / 3) * width);
+        label.setAttribute("y", height - 35 - (d.y / 20) * (height - 100));
+        label.setAttribute("font-size", "12px");
+        label.setAttribute("text-anchor", "middle");
+        label.textContent = d.label;
+        svg.appendChild(label);
+
+        // Check for label overlap
+        const bbox = label.getBBox();
+        const labelOverlap = data.some(
+          (dp) =>
+            dp.label !== d.label &&
+            Math.abs((dp.x / 3) * width - bbox.x - bbox.width / 2) < bbox.width / 2 +
+              10
+        );
+        if (labelOverlap) {
+          label.setAttribute("y", height - 55 - (d.y / 20) * (height - 100));
+        }
+      });
+    </script>
+  </body>
+</html>

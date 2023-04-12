@@ -84,6 +84,7 @@
 
 .kpi-table {
 	margin-bottom: 40px;
+  min-width: 800px;
 }
 
 .kpi-title {
@@ -126,7 +127,6 @@
   z-index: 14;
 }
 
-.kpi-point-global,
 .kpi-point-first-market {
 	height: 20px;
   width: 20px;
@@ -136,15 +136,13 @@
   z-index: 13;
 }
 
-.kpi-point-selected,
 .kpi-point-second-market {
 	background: #ba1314;
   color: #ba1314;
 }
 
-.kpi-point-global .kpi-point-value,
 .kpi-point-first-market .kpi-point-value {
-	top: -16px;
+	top: -18px;
   font-size: 14px;
   line-height: 16px;
 }
@@ -167,6 +165,7 @@
   font-size: 12px;
   line-height: 14px;
   font-weight: bold;
+  white-space: nowrap;
 }
 
 
