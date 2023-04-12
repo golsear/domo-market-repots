@@ -107,7 +107,7 @@ const mockDataByMarket = [
         Market: 'Mexico'
       },
       {
-        Value: 0.5,
+        Value: 0.05,
         Year: 2021,
         Market: 'Mexico'
       }
@@ -687,13 +687,10 @@ app.component('KpiRow', {
 app.component('SparkLine', {
   template: `<div>
 							<slot
-								:firstMarketPoint="firstMarketPoint"
-                :secondMarketPoint="secondMarketPoint"
-                :maxMarketPoint="maxMarketPoint"
-                :minMarketPoint="minMarketPoint"
-                :lineRangeOffset="lineRangeOffset" 
+								:lineRangeOffset="lineRangeOffset" 
                 :lineSelectedRangeOffset="lineSelectedRangeOffset"
-								:setElement="setElement"> 
+								:setElement="setElement"
+								:points="points"> 
 							</slot>
 						</div>`,
   props: [
@@ -709,7 +706,29 @@ app.component('SparkLine', {
       secondMarketPointRef: null
     }
   },
+  watch: {
+  	points: {
+     	handler(val){
+       this.$nextTick(() => {
+        console.log(document.querySelector('.kpi-line').getBoundingClientRect().x)
+          console.log('MIN', this.minMarketPointRef?.getBoundingClientRect())
+          console.log('MAX', this.maxMarketPointRef?.getBoundingClientRect())
+          console.log('FIRST', this.firstMarketPointRef?.getBoundingClientRect())
+          console.log('SECOND', this.secondMarketPointRef?.getBoundingClientRect())
+    		})
+     	},
+     	deep: true
+  	}
+	},
   computed: {
+    points () {
+      return {
+      	min: this.minMarketPoint, 
+        max: this.maxMarketPoint, 
+        first: this.firstMarketPoint, 
+        second: this.secondMarketPoint
+      }
+    },
     maxValue () {
     	return this.data ? this.data.maxValue : 0
     },
