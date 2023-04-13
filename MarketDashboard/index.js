@@ -69,6 +69,36 @@ const mockFilters = [
 
 const mockDataByMarket = [
   {
+    category: 'Global',
+    data: [
+      {
+        Value: 0.48,
+        Year: 2020,
+        Market: 'Global'
+      },
+      {
+        Value: 0.1,
+        Year: 2021,
+        Market: 'Global'
+      }
+    ]
+  },
+  {
+    category: 'Mexico',
+    data: [
+      {
+        Value: 0.33,
+        Year: 2020,
+        Market: 'Mexico'
+      },
+      {
+        Value: 0.12,
+        Year: 2021,
+        Market: 'Mexico'
+      }
+    ]
+  },
+  {
     category: 'United Kingdom',
     data: [
       {
@@ -77,7 +107,7 @@ const mockDataByMarket = [
         Market: 'United Kingdom' 
       },
       {
-        Value: 0.1,
+        Value: 0.13,
         Year: 2021,
         Market: 'United Kingdom' 
       }
@@ -92,24 +122,9 @@ const mockDataByMarket = [
         Market: 'Argentina' 
       },
       {
-        Value: 0.8,
+        Value: 0.1,
         Year: 2021,
         Market: 'Argentina'
-      }
-    ]
-  },
-  {
-    category: 'Mexico',
-    data: [
-      {
-        Value: 0.33,
-        Year: 2020,
-        Market: 'Mexico'
-      },
-      {
-        Value: 0.05,
-        Year: 2021,
-        Market: 'Mexico'
       }
     ]
   },
@@ -122,24 +137,9 @@ const mockDataByMarket = [
         Market: 'United States'
       },
       {
-        Value: 0.2,
+        Value: 0.14,
         Year: 2021,
         Market: 'United States'
-      }
-    ]
-  },
-  {
-    category: 'Global',
-    data: [
-      {
-        Value: 0.48,
-        Year: 2020,
-        Market: 'Global'
-      },
-      {
-        Value: 0.6,
-        Year: 2021,
-        Market: 'Global'
       }
     ]
   },
@@ -152,7 +152,7 @@ const mockDataByMarket = [
         Market: 'Mexico2'
       },
       {
-        Value: 0.37,
+        Value: 0.1,
         Year: 2021,
         Market: 'Mexico2'
       }
@@ -534,8 +534,8 @@ app.component('KpiRow', {
     },
     // Mockup data for developing
     mockSparkLineData () {
-      const mockFirstMarketData = mockDataByMarket[4]
-      const mockSecondMarketData = mockDataByMarket[2]
+      const mockFirstMarketData = mockDataByMarket[0]
+      const mockSecondMarketData = mockDataByMarket[1]
       
       if (mockFirstMarketData && 
           mockSecondMarketData &&
@@ -620,7 +620,7 @@ app.component('KpiRow', {
   methods: {
     getClosestMaxMinMarketValues (arr, targetMaxValue, targetMinValue) {
       return arr.reduce((acc, curr) => {
-        if (curr.data[1].Value < targetMaxValue) {
+        if (curr.data[1].Value <= targetMaxValue) {
           if (curr.data[1].Value > acc.max.closestMin.value) {
             acc.max.closestMin.data = curr;
             acc.max.closestMin.value = curr.data[1].Value
@@ -633,7 +633,7 @@ app.component('KpiRow', {
           }
         }
         
-        if (curr.data[1].Value < targetMinValue) {
+        if (curr.data[1].Value <= targetMinValue) {
           if (curr.data[1].Value > acc.min.closestMin.value) {
             acc.min.closestMin.data = curr;
             acc.min.closestMin.value = curr.data[1].Value
@@ -690,7 +690,8 @@ app.component('SparkLine', {
 								:lineRangeOffset="lineRangeOffset" 
                 :lineSelectedRangeOffset="lineSelectedRangeOffset"
 								:setElement="setElement"
-								:points="points"> 
+								:points="points"
+								:overlap="overlap"> 
 							</slot>
 						</div>`,
   props: [
@@ -703,23 +704,34 @@ app.component('SparkLine', {
     	maxMarketPointRef: null,
       minMarketPointRef: null,
       firstMarketPointRef: null,
-      secondMarketPointRef: null
+      secondMarketPointRef: null,
+      overlap: {
+      	minTitle: false,
+        minValue: false,
+        maxTitle: false,
+        maxValue: false,
+        secondValue: false
+      }
     }
   },
   watch: {
   	points: {
-     	handler(val){
-       this.$nextTick(() => {
-        console.log(document.querySelector('.kpi-line').getBoundingClientRect().x)
-          console.log('MIN', this.minMarketPointRef?.getBoundingClientRect())
-          console.log('MAX', this.maxMarketPointRef?.getBoundingClientRect())
-          console.log('FIRST', this.firstMarketPointRef?.getBoundingClientRect())
-          console.log('SECOND', this.secondMarketPointRef?.getBoundingClientRect())
-    		})
-     	},
+     	handler(val) {
+        
+        
+      
+      },
      	deep: true
   	}
 	},
+  mounted () {
+  	this.$nextTick(() => {
+    	// this.fixPosition()
+    })
+    setTimeout(() => {
+    	this.fixPosition()
+    }, 250)
+  },
   computed: {
     points () {
       return {
@@ -821,6 +833,64 @@ app.component('SparkLine', {
     }
   },
   methods: {
+    fixPosition () {
+    	const secondValueElClientRect = this.secondMarketPointRef ? this.secondMarketPointRef.querySelector('.kpi-point-value').getBoundingClientRect() : null
+          const minValueElClientRect = this.minMarketPointRef ? this.minMarketPointRef.querySelector('.kpi-point-value').getBoundingClientRect() : null
+          const minTitleElClientRect = this.minMarketPointRef ? this.minMarketPointRef.querySelector('.kpi-point-title').getBoundingClientRect() : null
+          const maxValueElClientRect = this.maxMarketPointRef ? this.maxMarketPointRef.querySelector('.kpi-point-value').getBoundingClientRect() : null
+          const maxTitleElClientRect = this.maxMarketPointRef ? this.maxMarketPointRef.querySelector('.kpi-point-title').getBoundingClientRect() : null
+          const overlapMinValue = (
+            									 minValueElClientRect &&
+            									 secondValueElClientRect &&
+            									 minValueElClientRect.left < secondValueElClientRect.right && 
+                             	 minValueElClientRect.right > secondValueElClientRect.left 
+          									 ) ||
+                						 (
+                               minValueElClientRect &&
+                               maxValueElClientRect &&
+                               minValueElClientRect.left < maxValueElClientRect.right && 
+                               minValueElClientRect.right > maxValueElClientRect.left
+                             )
+          const overlapMinMaxTitle = (
+                               minTitleElClientRect &&
+                               maxTitleElClientRect &&
+                               minTitleElClientRect.left < maxTitleElClientRect.right && 
+                               minTitleElClientRect.right > maxTitleElClientRect.left
+                             )                     
+          const overlapMaxValue = (
+                               maxValueElClientRect &&
+                               secondValueElClientRect && 
+                               maxValueElClientRect.left < secondValueElClientRect.right && 
+                               maxValueElClientRect.right > secondValueElClientRect.left 
+                             ) ||
+                						 (
+                               maxValueElClientRect &&
+                               minValueElClientRect &&
+                               maxValueElClientRect.left < minValueElClientRect.right && 
+                               maxValueElClientRect.right > minValueElClientRect.left
+                             )
+          /*const overlapSecond = ( 
+                              		secondValueElClientRect &&
+                                  maxValueElClientRect && 
+                                  secondValueElClientRect.left < maxValueElClientRect.right && 
+                             		  secondValueElClientRect.right > maxValueElClientRect.left 
+                                ) ||
+                						 		( 
+                              		secondValueElClientRect &&
+                                  minValueElClientRect &&
+                                  secondValueElClientRect.left < minValueElClientRect.right && 
+                             		  secondValueElClientRect.right > minValueElClientRect.left 
+                                )*/
+          this.overlap = {
+      			minTitle: overlapMinMaxTitle,
+        		minValue: overlapMinValue,
+        		maxTitle: overlapMinMaxTitle,
+        		maxValue: overlapMaxValue,
+        		secondValue: false
+      		}
+          console.log(maxValueElClientRect, secondValueElClientRect)
+          console.log('OVERLAP', this.overlap)
+    },
     setElement (el, key) {
       this[`${key}Ref`] = el
     },
@@ -843,7 +913,6 @@ app.component('SparkLine', {
       }
       const el = this[`${point}Ref`]
       
-      console.log('EL', point, el?.getBoundingClientRect())
       const pointValue = data.Value 
       const market = data.Market
       const type = pointValue < 1 ? 'percent' : 'number'

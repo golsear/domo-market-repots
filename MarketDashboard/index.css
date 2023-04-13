@@ -124,7 +124,7 @@
 	position: absolute;
   border-radius: 50%; 
   margin: -3px 0 0 -4px;
-  z-index: 14;
+  z-index: 20;
 }
 
 .kpi-point-first-market {
@@ -133,12 +133,13 @@
   background: #333333;
   color: #333333;
   margin: -9px 0 0 -10px;
-  z-index: 13;
+  z-index: 15;
 }
 
 .kpi-point-second-market {
 	background: #ba1314;
   color: #ba1314;
+  z-index: 25;
 }
 
 .kpi-point-first-market .kpi-point-value {
@@ -168,6 +169,9 @@
   white-space: nowrap;
 }
 
+.kpi-point-closest-max-market .kpi-point-title.kpi-point-title-overlap {
+  bottom: -32px;
+}
 
 .kpi-change {
   align-items: center;
