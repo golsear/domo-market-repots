@@ -121,18 +121,15 @@
                   <div class="kpi-description">{{ slotProps.description }}</div>
                 </div>
                 <div>
-                  <spark-line
-                              :first-market-data="slotProps.firstMarketData"
-                              :second-market-data="slotProps.secondMarketData"
-                              :data="slotProps.sparkLineData"          
+                  <spark-line :data="slotProps.sparkLineData"
                               v-slot="slotProps">
                     <div>firstMarketPoint: {{ slotProps.points.first }}<br/><br/></div>
                     <div>secondMarketPoint: {{ slotProps.points.second }}<br/><br/></div>
                     <div>minMarketPoint: {{ slotProps.points.min }}<br/><br/></div>
                     <div style="margin-bottom: 50px">maxMarketPoint: {{ slotProps.points.max }}</div>
                     <div class="kpi-line">
-                      <div class="kpi-line-range" :style="`left: ${slotProps.lineRangeOffset.left}%; right: ${slotProps.lineRangeOffset.right}%`"></div>
-                      <div class="kpi-line-selected-range" :style="`left: ${slotProps.lineSelectedRangeOffset.left}%; right: ${slotProps.lineSelectedRangeOffset.right}%`"></div>
+                      <div class="kpi-line-range" :style="`left: ${slotProps.points.lineRange?.left}%; right: ${slotProps.points.lineRange?.right}%`"></div>
+                      <div class="kpi-line-selected-range" :style="`left: ${slotProps.points.lineSelectedRange?.left}%; right: ${slotProps.points.lineSelectedRange?.right}%`"></div>
                       <div v-if="slotProps.points.min"
                            :ref="(el) => slotProps.setElement(el, 'minMarketPoint')"
                            class="kpi-point kpi-point-closest-min-market" 

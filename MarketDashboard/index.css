@@ -158,6 +158,16 @@
   font-weight: bold;
 }
 
+._kpi-point-value {
+  position: absolute;
+  left: 0;
+  top: -12px;
+  font-size: 10px;
+  line-height: 12px;
+  font-weight: bold;
+}
+
+
 .kpi-point-title {
   position: absolute;
   right: 50%;

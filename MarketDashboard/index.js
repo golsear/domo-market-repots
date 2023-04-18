@@ -5,6 +5,7 @@ const domo = window.domo
 const datasets = window.datasets
 
 const mockupMode = false
+const mockupFilters = false
 
 const fields = [
   'Market', 
@@ -43,8 +44,8 @@ const mockFilters = [
         column: 'Market',
         operand: 'IN',
         values: [
-            'Global',
-            'Mexico'
+            'United Kingdom',
+            'United States'
         ],
         dataType: 'string',
         label: 'Market',
@@ -56,8 +57,8 @@ const mockFilters = [
         column: 'Year',
         operand: 'IN',
         values: [
-            '2020',
-            '2021'
+            '2021',
+            '2022'
         ],
         dataType: 'numeric',
         label: 'Year',
@@ -74,12 +75,14 @@ const mockDataByMarket = [
       {
         Value: 0.48,
         Year: 2020,
-        Market: 'Global'
+        Market: 'Global',
+        Description: 'KPI description'
       },
       {
         Value: 0.1,
         Year: 2021,
-        Market: 'Global'
+        Market: 'Global',
+        Description: 'KPI description'
       }
     ]
   },
@@ -89,12 +92,14 @@ const mockDataByMarket = [
       {
         Value: 0.33,
         Year: 2020,
-        Market: 'Mexico'
+        Market: 'Mexico',
+        Description: 'KPI description'
       },
       {
         Value: 0.12,
         Year: 2021,
-        Market: 'Mexico'
+        Market: 'Mexico',
+        Description: 'KPI description'
       }
     ]
   },
@@ -104,12 +109,14 @@ const mockDataByMarket = [
       {
         Value: 0.28,
         Year: 2020,
-        Market: 'United Kingdom' 
+        Market: 'United Kingdom',
+        Description: 'KPI description'
       },
       {
-        Value: 0.13,
+        Value: 0.3,
         Year: 2021,
-        Market: 'United Kingdom' 
+        Market: 'United Kingdom',
+        Description: 'KPI description'
       }
     ]
   },
@@ -119,12 +126,14 @@ const mockDataByMarket = [
       {
         Value: 0.21,
         Year: 2020,
-        Market: 'Argentina' 
+        Market: 'Argentina',
+        Description: 'KPI description'
       },
       {
-        Value: 0.1,
+        Value: 0.5,
         Year: 2021,
-        Market: 'Argentina'
+        Market: 'Argentina',
+        Description: 'KPI description'
       }
     ]
   },
@@ -134,12 +143,14 @@ const mockDataByMarket = [
       {
         Value: 0.45,
         Year: 2020,
-        Market: 'United States'
+        Market: 'United States',
+        Description: 'KPI description'
       },
       {
-        Value: 0.14,
+        Value: 0.8,
         Year: 2021,
-        Market: 'United States'
+        Market: 'United States',
+        Description: 'KPI description'
       }
     ]
   },
@@ -149,16 +160,23 @@ const mockDataByMarket = [
       {
         Value: 0.33,
         Year: 2020,
-        Market: 'Mexico2'
+        Market: 'Mexico2',
+        Description: 'KPI description'
       },
       {
-        Value: 0.1,
+        Value: 0.9,
         Year: 2021,
-        Market: 'Mexico2'
+        Market: 'Mexico2',
+        Description: 'KPI description'
       }
     ]
   },
 ]
+
+const mockMarketKeys = {
+	first: 0,
+  second: 4
+}
 
 const categoryDictionary = {
   "Brand strength": [
@@ -209,6 +227,22 @@ const groupByProperty = (arr, property) => {
 
 const round = (value) => {
    return Math.sign(value) * Math.round(Math.abs(value))
+}
+
+const doubleRequestAnimationFrame = (callback) => {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(callback)
+  })
+}
+
+const forceNextTick = (callback) => {
+  if (callback && typeof callback === 'function') {
+    doubleRequestAnimationFrame(callback)
+  } else {
+    return new Promise(resolve => {
+      doubleRequestAnimationFrame(resolve)
+    })
+  }
 }
 
 app.config.globalProperties.emitter = emitter
@@ -302,7 +336,12 @@ app.component('MarketDashboard', {
      		filters: mockFilters
   		})
     }
-  },
+    if (mockupFilters) {
+    	this.emitter.emit('update-data', {
+      	filters: mockFilters
+    	})
+  	}
+   },
   methods: {
     async getData () {
       try {
@@ -430,9 +469,7 @@ app.component('KpiRow', {
 								:secondMarket="secondMarket"
                 :secondKpiChange="secondMarketKpiChange"
                 :secondKpiChangeCss="secondMarketKpiChangeCss"
-                :firstMarketData="firstMarketData"
-                :secondMarketData="secondMarketData"
-								:sparkLineData="sparkLineData"> 
+                :sparkLineData="sparkLineData"> 
 							</slot>
 						</div>`,
   props: [
@@ -452,14 +489,14 @@ app.component('KpiRow', {
     }
   },
   computed: {
-  	firstMarketData () {
+  	/*firstMarketData () {
       return this.getMarketData('first')
-    },
-    secondMarketData () {
+    },*/
+    /*secondMarketData () {
     	return this.getMarketData('second')
-    },
+    },*/
     kpiDescription () {
-    	return this.dataByMarket.length 
+      return this.dataByMarket.length 
         ? this.dataByMarket[0].data[0].Description : ''
     },
     firstMarketKpiChange () {
@@ -479,14 +516,17 @@ app.component('KpiRow', {
           return this.mockSparkLineData
       }
       
-      if (this.firstMarketData && 
-          this.secondMarketData &&
-          this.firstMarketData.data.length === 2 &&
-          this.secondMarketData.data.length === 2) {
+      const firstMarketData = this.getMarketData('first')
+      const secondMarketData = this.getMarketData('second')
+      
+      if (firstMarketData && 
+          secondMarketData &&
+          firstMarketData.data.length === 2 &&
+          secondMarketData.data.length === 2) {
         let maxSelectedMarketsValue
         let minSelectedMarketsValue
-        const firstMarketData = this.firstMarketData
-        const secondMarketData = this.secondMarketData
+        // const firstMarketData = this.firstMarketData
+        // const secondMarketData = this.secondMarketData
         const firstValue = firstMarketData.data[1].Value;
 				const secondValue = secondMarketData.data[1].Value;
         const dataByMarket = this.dataByMarket
@@ -527,24 +567,28 @@ app.component('KpiRow', {
         console.log('=== <<< ===')
       	return { 
           closestMinMaxData,
-          maxValue: Math.max(...allValues)
+          maxValue: Math.max(...allValues),
+          firstMarketData,
+          secondMarketData
         }
       }            
     	return null
     },
     // Mockup data for developing
     mockSparkLineData () {
-      const mockFirstMarketData = mockDataByMarket[0]
-      const mockSecondMarketData = mockDataByMarket[1]
+      // const firstMarketData = mockDataByMarket[0]
+      // const secondMarketData = mockDataByMarket[1]
+      const firstMarketData = this.getMarketData('first')
+      const secondMarketData = this.getMarketData('second')
       
-      if (mockFirstMarketData && 
-          mockSecondMarketData &&
-          mockFirstMarketData.data.length === 2 &&
-          mockSecondMarketData.data.length === 2) {
+      if (firstMarketData && 
+          secondMarketData &&
+          firstMarketData.data.length === 2 &&
+          secondMarketData.data.length === 2) {
         let maxSelectedMarketsValue
         let minSelectedMarketsValue
-        const firstMarketData = mockFirstMarketData
-        const secondMarketData = mockSecondMarketData
+        // const firstMarketData = mockFirstMarketData
+        // const secondMarketData = mockSecondMarketData
         const firstValue = firstMarketData.data[1].Value;
 				const secondValue = secondMarketData.data[1].Value;
         const dataByMarket = mockDataByMarket
@@ -585,7 +629,9 @@ app.component('KpiRow', {
         console.log('=== <<< ===')
       	return { 
           closestMinMaxData,
-          maxValue: Math.max(...allValues)
+          maxValue: Math.max(...allValues),
+          firstMarketData,
+          secondMarketData
         }
       }            
     	return null
@@ -661,11 +707,18 @@ app.component('KpiRow', {
     },
   	groupByProperty,
     getMarketData (marketKey) {
+      if (mockupMode) {
+        const mockMarketKey = mockMarketKeys[marketKey] 
+        const data = mockDataByMarket[mockMarketKey]
+        return data
+      }
+      
       const data = this.dataByMarket.find((market) => market.category === this[`${marketKey}Market`])
       return data
     },
     getMarketKpiChange (marketKey) {
-      const marketData = this[`${marketKey}MarketData`]
+      const marketData = this.getMarketData(marketKey)
+      // const marketData = this[`${marketKey}MarketData`]
       console.log('getMarketKpiChange: marketData', marketData)
       
       if (!marketData || marketData.data.length < 2) {
@@ -687,16 +740,14 @@ app.component('KpiRow', {
 app.component('SparkLine', {
   template: `<div>
 							<slot
-								:lineRangeOffset="lineRangeOffset" 
-                :lineSelectedRangeOffset="lineSelectedRangeOffset"
 								:setElement="setElement"
 								:points="points"
 								:overlap="overlap"> 
 							</slot>
 						</div>`,
   props: [
-  	'firstMarketData',
-    'secondMarketData',
+  	/*'firstMarketData',
+    'secondMarketData',*/
     'data'
   ],
   data () {
@@ -711,40 +762,41 @@ app.component('SparkLine', {
         maxTitle: false,
         maxValue: false,
         secondValue: false
+      },
+      points: {
+      	min: null,
+        max: null,
+        first: null,
+        second: null
       }
     }
   },
   watch: {
-  	points: {
-     	handler(val) {
-        
-        
-      
+  	data: {
+     	handler(data, newData) {
+        console.log('WATCH', data, newData) 
+        this.updatePoints()
       },
      	deep: true
   	}
 	},
   mounted () {
-  	this.$nextTick(() => {
-    	// this.fixPosition()
-    })
-    setTimeout(() => {
-    	this.fixPosition()
-    }, 250)
+    console.log('SparkLine: mounted: data', this.data, this.secondMarketData, this.firstMarketData)
+    this.updatePoints()
   },
   computed: {
-    points () {
+    /* points () {
       return {
       	min: this.minMarketPoint, 
         max: this.maxMarketPoint, 
         first: this.firstMarketPoint, 
         second: this.secondMarketPoint
       }
-    },
+    }, */
     maxValue () {
     	return this.data ? this.data.maxValue : 0
     },
-    lineRangeOffset () {
+    /*lineRangeOffset () {
     	if (this.firstMarketPoint && 
           this.secondMarketPoint &&
           this.minMarketPoint &&
@@ -779,8 +831,8 @@ app.component('SparkLine', {
       	left: 0,
         right: 0
       }
-    },
-    lineSelectedRangeOffset () {
+    },*/
+    /*lineSelectedRangeOffset () {
     	if (this.firstMarketPoint && this.secondMarketPoint) {
       	return {
           left: this.firstMarketPoint.offset > this.secondMarketPoint.offset ? this.secondMarketPoint.offset : this.firstMarketPoint.offset, 
@@ -792,8 +844,8 @@ app.component('SparkLine', {
       	left: 0,
         right: 0
       }
-    },
-    maxMarketPoint () {
+    },*/
+    /*maxMarketPoint () {
     	if (this.data) {
         const maxPointData = this.data.closestMinMaxData.max
         return isFinite(maxPointData.closestMax.value) ? 
@@ -804,8 +856,8 @@ app.component('SparkLine', {
       }
       
       return null
-    },
-    minMarketPoint () {
+    },*/
+    /*minMarketPoint () {
     	if (this.data) {
         const minPointData = this.data.closestMinMaxData.min
         return isFinite(minPointData.closestMin.value) ? 
@@ -816,25 +868,117 @@ app.component('SparkLine', {
       }
       
       return null
-    },
-  	firstMarketPoint () {
+    },*/
+  	/*firstMarketPoint () {
       if (this.firstMarketData && this.firstMarketData.data.length === 2) {
         return this.getPoint(this.firstMarketData.data[1], 'firstMarketPoint')    
       }
       
       return null
-    },
-    secondMarketPoint () {
+    },*/
+    /*secondMarketPoint () {
       if (this.secondMarketData && this.secondMarketData.data.length === 2) {
       	return this.getPoint(this.secondMarketData.data[1], 'secondMarketPoint')     
       }
       
       return null
-    }
+    }*/
   },
   methods: {
+    updatePoints () {
+    	/*this.$nextTick(() => {
+        this.fixPosition()
+      })*/
+      this.setPoints()
+    },
+    setPoints () {
+      if (this.data) {
+      	const minPointData = this.data.closestMinMaxData.min
+        const minPoint = isFinite(minPointData.closestMin.value) ?
+              this.getPoint(minPointData.closestMin.data.data[1], 'minMarketPoint') :
+              (isFinite(minPointData.closestMax.value) ?
+                this.getPoint(minPointData.closestMax.data.data[1], 'minMarketPoint') :
+                null)
+        const maxPointData = this.data.closestMinMaxData.max
+        const maxPoint = isFinite(maxPointData.closestMax.value) ? 
+              this.getPoint(maxPointData.closestMax.data.data[1], 'maxMarketPoint') :
+              (isFinite(maxPointData.closestMin.value) ? 
+                this.getPoint(maxPointData.closestMin.data.data[1], 'maxMarketPoint') :
+                null)
+        const firstPoint = this.data.firstMarketData && this.data.firstMarketData.data.length === 2 ?
+              this.getPoint(this.data.firstMarketData.data[1], 'firstMarketPoint') :
+              null
+        const secondPoint = this.data.secondMarketData && this.data.secondMarketData.data.length === 2 ?
+              this.getPoint(this.data.secondMarketData.data[1], 'secondMarketPoint') :
+              null
+        const lineSelectedRange = this.getLineSelectedRange(firstPoint, secondPoint)
+        const lineRange = this.getLineRange (firstPoint, secondPoint, minPoint, maxPoint)
+
+        this.points = {
+          min: minPoint,
+          max: maxPoint,
+          first: firstPoint,
+          second: secondPoint,
+          lineSelectedRange,
+          lineRange
+        }
+        
+        forceNextTick(() => {
+      		this.fixPosition() 
+      	})
+      }
+      
+    
+    },
+    getLineSelectedRange (firstPoint, secondPoint) {
+    	return firstPoint && secondPoint ?
+      {
+      	left: firstPoint.offset > secondPoint.offset ? secondPoint.offset : firstPoint.offset, 
+        right: firstPoint.offset > secondPoint.offset ? 100 - firstPoint.offset : 100 - secondPoint.offset 
+      } :   
+      {
+      	left: 0,
+        right: 0
+      }
+    },
+    getLineRange (firstPoint, secondPoint, minPoint, maxPoint) {
+    	if (firstPoint && 
+          secondPoint &&
+          minPoint &&
+          maxPoint) {
+      	
+        const points = [
+          firstPoint,
+          secondPoint,
+          minPoint,
+          maxPoint,
+        ]
+        
+        const offsets = points.reduce((acc, obj) => {
+          if (obj.offset > acc.maxOffset) {
+            acc.maxOffset = obj.offset
+          }
+          
+          if (obj.offset < acc.minOffset) {
+            acc.minOffset = obj.offset
+          }
+          
+          return acc
+        }, { maxOffset: -Infinity, minOffset: Infinity })
+        
+        return {
+          left: offsets.minOffset, 
+          right: 100 - offsets.maxOffset
+        }   
+      }
+      
+      return {
+      	left: 0,
+        right: 0
+      }
+    },
     fixPosition () {
-    	const secondValueElClientRect = this.secondMarketPointRef ? this.secondMarketPointRef.querySelector('.kpi-point-value').getBoundingClientRect() : null
+    			const secondValueElClientRect = this.secondMarketPointRef ? this.secondMarketPointRef.querySelector('.kpi-point-value').getBoundingClientRect() : null
           const minValueElClientRect = this.minMarketPointRef ? this.minMarketPointRef.querySelector('.kpi-point-value').getBoundingClientRect() : null
           const minTitleElClientRect = this.minMarketPointRef ? this.minMarketPointRef.querySelector('.kpi-point-title').getBoundingClientRect() : null
           const maxValueElClientRect = this.maxMarketPointRef ? this.maxMarketPointRef.querySelector('.kpi-point-value').getBoundingClientRect() : null
@@ -888,8 +1032,8 @@ app.component('SparkLine', {
         		maxValue: overlapMaxValue,
         		secondValue: false
       		}
-          console.log(maxValueElClientRect, secondValueElClientRect)
-          console.log('OVERLAP', this.overlap)
+          // console.log(maxValueElClientRect, secondValueElClientRect)
+          // console.log('OVERLAP', this.overlap)
     },
     setElement (el, key) {
       this[`${key}Ref`] = el
