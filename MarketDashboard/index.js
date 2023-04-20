@@ -5,7 +5,7 @@ const domo = window.domo
 const datasets = window.datasets
 
 const mockupMode = false
-const mockupFilters = true
+const mockupFilters = false
 
 const fields = [
   'Market', 
@@ -891,6 +891,49 @@ app.component('SparkLine', {
         width: null
       }
     },
+  	fixPosition_ () {
+    	const sortedPoints = [
+        { ...this.points.min },
+        { ...this.points.max },
+        { ...this.points.second }
+      ]
+      .sort((a, b) => {
+        return a.offset > b.offset ? 1 : -1
+      })
+		  const points = sortedPoints.map((point) => {
+        const valueBounds = this[`${point.point}Ref`] ? this.getBoundingClientRectWithTransform(this[`${point.point}Ref`]?.querySelector('.kpi-point-value')) : null
+        //console.log('pointBounds', pointBounds) 
+        point.valueBounds = valueBounds
+        return point
+      })
+        
+      this.preventLabelOverlap(points)  
+    },
+    preventLabelOverlap(labelElems) {
+			// calculate the offset for each label
+  		let offset = 0;
+  		labelElems.forEach((labelElem, i) => {
+        console.log('labelElem', labelElem)
+    		const labelWidth = labelElem.valueBounds.width
+    		if (i > 0) {
+      		const prevLabelElem = labelElems[i - 1]
+      		const prevLabelLeft = prevLabelElem.valueBounds.left
+        	const prevLabelRight = prevLabelElem.valueBounds.right
+      		const labelLeft = labelElem.valueBounds.left
+          const labelRight = labelElem.valueBounds.right
+      		if (prevLabelRight + offset > labelLeft && prevLabelLeft + offset < labelRight ) {
+        		console.log('set offset', offset, prevLabelLeft, prevLabelRight, labelLeft, labelRight)
+        		// offset = prevLabelRight - labelLeft
+      		} else {
+        		offset = 0
+        	}
+    		}
+        console.log('offset >', offset)
+    		// labelElem.style.transform = `translateX(${offset}px)`
+    		// offset += labelWidth
+      })
+      console.log('=======================')  
+		},
     fixPosition () {
       const secondValueElBounds = this.secondMarketPointRef ? this.getBoundingClientRectWithTransform(this.secondMarketPointRef?.querySelector('.kpi-point-value')) : null
       const minValueElBounds = this.minMarketPointRef ? this.getBoundingClientRectWithTransform(this.minMarketPointRef?.querySelector('.kpi-point-value')) : null
