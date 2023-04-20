@@ -285,3 +285,12 @@
   z-index: 100;
 }
 
+.mock-line {
+  background: red;
+  height: 40px;
+  left: 0;
+  position: absolute;
+  top: -19px;
+	width: 1px;
+}
+

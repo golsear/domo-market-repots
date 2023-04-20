@@ -127,7 +127,12 @@
                     <div>secondMarketPoint: {{ slotProps.points.second }}<br/><br/></div>
                     <div>minMarketPoint: {{ slotProps.points.min }}<br/><br/></div>
                     <div style="margin-bottom: 50px">maxMarketPoint: {{ slotProps.points.max }}</div>
-                    <div class="kpi-line">
+                    <div class="kpi-line"
+                         :ref="(el) => slotProps.setElement(el, 'line')">
+                      <div v-if="slotProps.mock"
+                           class="mock-line"
+                           :style="`left: ${slotProps.offset.mockLine}px`"
+                           :ref="(el) => slotProps.setElement(el, 'mockLine')"></div>
                       <div class="kpi-line-range" :style="`left: ${slotProps.points.lineRange?.left}%; right: ${slotProps.points.lineRange?.right}%`"></div>
                       <div class="kpi-line-selected-range" :style="`left: ${slotProps.points.lineSelectedRange?.left}%; right: ${slotProps.points.lineSelectedRange?.right}%`"></div>
                       <div v-if="slotProps.points.min"
