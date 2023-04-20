@@ -294,3 +294,7 @@
 	width: 1px;
 }
 
+.visibility-hidden {
+	visibility: hidden;
+}
+

@@ -5,7 +5,7 @@ const domo = window.domo
 const datasets = window.datasets
 
 const mockupMode = false
-const mockupFilters = false
+const mockupFilters = true
 
 const fields = [
   'Market', 
@@ -815,9 +815,10 @@ app.component('SparkLine', {
         }
         
         this.$nextTick(() => {
-        	forceNextTick(() => {
+          this.fixPosition()
+        	/*forceNextTick(() => {
           	this.fixPosition()
-        	})
+        	})*/
         })
       }
     },
@@ -891,7 +892,6 @@ app.component('SparkLine', {
       }
     },
     fixPosition () {
-      console.log('fixPosition')
       const secondValueElBounds = this.secondMarketPointRef ? this.getBoundingClientRectWithTransform(this.secondMarketPointRef?.querySelector('.kpi-point-value')) : null
       const minValueElBounds = this.minMarketPointRef ? this.getBoundingClientRectWithTransform(this.minMarketPointRef?.querySelector('.kpi-point-value')) : null
       const minTitleElBounds = this.minMarketPointRef ? this.getBoundingClientRectWithTransform(this.minMarketPointRef?.querySelector('.kpi-point-title')) : null
@@ -901,7 +901,8 @@ app.component('SparkLine', {
         minValueElBounds != null && secondValueElBounds != null &&
         minValueElBounds.left < secondValueElBounds.right &&
         minValueElBounds.right > secondValueElBounds.left
-      ) || (
+      ) || 
+      (
         minValueElBounds != null && maxValueElBounds != null &&
         minValueElBounds.left < maxValueElBounds.right &&
         minValueElBounds.right > maxValueElBounds.left
@@ -916,7 +917,8 @@ app.component('SparkLine', {
         maxValueElBounds != null && secondValueElBounds != null &&
         maxValueElBounds.left < secondValueElBounds.right &&
         maxValueElBounds.right > secondValueElBounds.left
-      ) || (
+      ) || 
+      (
         maxValueElBounds != null && minValueElBounds != null &&
         maxValueElBounds.left < minValueElBounds.right &&
         maxValueElBounds.right > minValueElBounds.left
