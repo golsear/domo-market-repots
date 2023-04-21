@@ -784,7 +784,12 @@ app.component('SparkLine', {
   methods: {
     setPoints () {
       if (this.data) {
-      	const minPointData = this.data.closestMinMaxData.min
+        // if (this.minMarketPointRef) { this.minMarketPointRef.querySelector('.kpi-point-value').style = '' }
+      	// if (this.maxMarketPointRef) { this.maxMarketPointRef.querySelector('.kpi-point-value').style = '' }
+      	// if (this.firstMarketPointRef) { this.firstMarketPointRef.querySelector('.kpi-point-value').style = '' }
+        
+        
+        const minPointData = this.data.closestMinMaxData.min
         const minPoint = isFinite(minPointData.closestMin.value) ?
               this.getPoint(minPointData.closestMin.data.data[1], 'minMarketPoint') :
               (isFinite(minPointData.closestMax.value) ?
@@ -815,8 +820,15 @@ app.component('SparkLine', {
         }
         
         this.$nextTick(() => {
-          this.fixPosition()
-        	/*forceNextTick(() => {
+          if (this.mock) {
+            this.fixPosition_()
+          	/*forceNextTick(() => {
+          		this.fixPosition_()
+        		})*/
+          } else {
+            this.fixPosition()  
+          }
+          /*forceNextTick(() => {
           	this.fixPosition()
         	})*/
         })
@@ -872,6 +884,7 @@ app.component('SparkLine', {
     getBoundingClientRectWithTransform (element) {
       const clientRect = element?.getBoundingClientRect()
       const transform = window.getComputedStyle(element)?.getPropertyValue('transform')
+      
       if (transform) {
         const matrix = transform.match(/^matrix\((.+)\)$/)
         if (matrix) {
@@ -880,6 +893,7 @@ app.component('SparkLine', {
           return {
             left: clientRect?.left + translateX,
             right: clientRect?.right + translateX,
+            translateX,
             width: clientRect?.width
           }
         }
@@ -888,51 +902,71 @@ app.component('SparkLine', {
       return {
         left: null,
         right: null,
+        translateX: 0,
         width: null
       }
     },
   	fixPosition_ () {
-    	const sortedPoints = [
+      const sortedPoints = [
         { ...this.points.min },
         { ...this.points.max },
         { ...this.points.second }
-      ]
-      .sort((a, b) => {
-        return a.offset > b.offset ? 1 : -1
-      })
-		  const points = sortedPoints.map((point) => {
-        const valueBounds = this[`${point.point}Ref`] ? this.getBoundingClientRectWithTransform(this[`${point.point}Ref`]?.querySelector('.kpi-point-value')) : null
-        //console.log('pointBounds', pointBounds) 
-        point.valueBounds = valueBounds
+        ]
+        .sort((a, b) => {
+          return a.offset > b.offset ? 1 : -1
+        })
+       const points = sortedPoints.map((point) => {
+       const valueBounds = this[`${point.point}Ref`] ? this.getBoundingClientRectWithTransform(this[`${point.point}Ref`]?.querySelector('.kpi-point-value')) : null
+          //console.log('pointBounds', pointBounds) 
+       	point.valueBounds = valueBounds
         return point
-      })
+       })
+
+       this.preventLabelOverlap(points)
         
-      this.preventLabelOverlap(points)  
     },
     preventLabelOverlap(labelElems) {
-			// calculate the offset for each label
-  		let offset = 0;
-  		labelElems.forEach((labelElem, i) => {
+      let offset = 0;
+  		
+      labelElems.forEach((labelElem, i) => {
+        labelElem.translateX = null
         console.log('labelElem', labelElem)
-    		const labelWidth = labelElem.valueBounds.width
     		if (i > 0) {
-      		const prevLabelElem = labelElems[i - 1]
-      		const prevLabelLeft = prevLabelElem.valueBounds.left
-        	const prevLabelRight = prevLabelElem.valueBounds.right
-      		const labelLeft = labelElem.valueBounds.left
-          const labelRight = labelElem.valueBounds.right
-      		if (prevLabelRight + offset > labelLeft && prevLabelLeft + offset < labelRight ) {
-        		console.log('set offset', offset, prevLabelLeft, prevLabelRight, labelLeft, labelRight)
-        		// offset = prevLabelRight - labelLeft
-      		} else {
-        		offset = 0
+        	const prevLabelElem = labelElems[i - 1]
+      		const prevLabelElemValueBounds = prevLabelElem.valueBounds
+      		const labelElemValueBounds = labelElem.valueBounds
+        
+        	if (labelElemValueBounds && prevLabelElemValueBounds) {
+        		const prevLabelLeft = prevLabelElem.valueBounds.left
+            const prevLabelRight = prevLabelElem.valueBounds.right
+            const labelLeft = labelElem.valueBounds.left
+            const labelRight = labelElem.valueBounds.right
+            const labelWidth = labelElem.valueBounds.width
+            if (prevLabelRight + offset > labelLeft && prevLabelLeft + offset < labelRight ) {
+        			const offset = prevLabelRight /*+ offset*/ - labelLeft
+              console.log('set offset', offset, prevLabelLeft, prevLabelRight, labelLeft, labelRight)
+        			labelElem.translateX = offset + labelWidth/2
+        			this[`${labelElem.point}Ref`].querySelector('.kpi-point-value').style.transform = `translateX(${offset + labelWidth/2}px)`
+            } else {
+              offset = 0
+        			labelElem.translateX = null
+							this[`${labelElem.point}Ref`].querySelector('.kpi-point-value').style = ''
+            }
         	}
-    		}
-        console.log('offset >', offset)
-    		// labelElem.style.transform = `translateX(${offset}px)`
-    		// offset += labelWidth
+        }
       })
-      console.log('=======================')  
+      
+      this.$nextTick(() => {
+      	labelElems.forEach((labelElem, i) => {
+          if (labelElem.translateX) {
+						console.log('translateX', labelElem.translateX)
+						// this[`${labelElem.point}Ref`].querySelector('.kpi-point-value').style.transform = `translateX(${labelElem.translateX}px)`
+            // this[`${labelElem.point}Ref`].querySelector('.kpi-point-value').style.transform = `translateX(${labelElem.translateX}px)`
+          }
+        })  
+      })
+        
+      console.log('=======================', labelElems)  
 		},
     fixPosition () {
       const secondValueElBounds = this.secondMarketPointRef ? this.getBoundingClientRectWithTransform(this.secondMarketPointRef?.querySelector('.kpi-point-value')) : null

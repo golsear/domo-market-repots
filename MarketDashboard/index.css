@@ -87,6 +87,10 @@
   min-width: 800px;
 }
 
+.kpi-table {
+	min-width: 1242px;
+}
+
 .kpi-title {
   color: #333333;
   font-size: 14px;
