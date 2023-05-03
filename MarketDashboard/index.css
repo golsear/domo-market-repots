@@ -29,6 +29,11 @@
   padding: 20px 10px;
 }
 
+.grid > div.spark-line-column {
+	padding-left: 20px;
+  padding-right: 20px;
+}
+
 .grid.grid-total > div {
   border: 1px solid transparent;
   border-width: 0 1px 1px 0;
@@ -147,7 +152,7 @@
 }
 
 .kpi-point-first-market .kpi-point-value {
-	top: -18px;
+	top: -23px;
   font-size: 14px;
   line-height: 16px;
 }
@@ -156,19 +161,60 @@
   position: absolute;
   right: 50%;
   transform: translate(50%,0);
-  top: -12px;
+  top: -16px;
   font-size: 10px;
   line-height: 12px;
   font-weight: bold;
+  white-space: nowrap;
 }
+
+.kpi-point-value-overlap {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 14px;
+  position: absolute;
+}
+
+.kpi-point-closest-max-market .kpi-point-value-overlap {
+	right: 0;
+  top: 1px;
+  transform: translateX(100%);
+}
+
+.kpi-point-closest-max-market .kpi-point-value-overlap:before {
+	content: '-';
+  display: inline-block;
+  padding: 0 2px;
+}
+
+
+.kpi-point-closest-min-market .kpi-point-value-overlap {
+	left: 0;
+  transform: translateX(-100%);
+}
+
+.kpi-point-closest-min-market .kpi-point-value-overlap:after {
+	content: '-';
+  display: inline-block;
+  padding: 0 2px;
+}
+
+
+.kpi-point-value.kpi-point-value-mock {
+  top: -36px;
+}
+
 
 ._kpi-point-value {
   position: absolute;
-  left: 0;
+  right: 50%;
+  transform: translate(50%,0);
   top: -12px;
   font-size: 10px;
   line-height: 12px;
   font-weight: bold;
+  white-space: nowrap;
 }
 
 
