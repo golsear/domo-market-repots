@@ -5,7 +5,7 @@ const domo = window.domo
 const datasets = window.datasets
 
 const mockupMode = false
-const mockupFilters = true
+const mockupFilters = false
 const mockLabels = false
 
 const fields = [
@@ -46,8 +46,8 @@ const mockFilters = [
         operand: 'IN',
         values: [
             'United Kingdom',
-            //'United States'
-          	'Mexico'
+            'United States'
+          	//'Mexico'
         ],
         dataType: 'string',
         label: 'Market',
@@ -776,7 +776,7 @@ app.component('SparkLine', {
         this.setPoints()
       },
      	deep: true
-  	},
+  	}
   },
   mounted () {
     console.log('SparkLine: mounted: data', this.data, this.secondMarketData, this.firstMarketData)
@@ -814,11 +814,9 @@ app.component('SparkLine', {
         const lineSelectedRange = this.getLineSelectedRange(firstPoint, secondPoint)
         const lineRange = this.getLineRange (firstPoint, secondPoint, minPoint, maxPoint)
 
-        console.log('secondPoint', secondPoint.isMin)
-        
         this.points = {
-          min: secondPoint.isMin ? null : minPoint,
-          max: secondPoint.isMax ? null : maxPoint,
+          min: minPoint,
+          max: maxPoint,
           first: firstPoint,
           second: secondPoint,
           lineSelectedRange,
@@ -885,8 +883,8 @@ app.component('SparkLine', {
       const clientRect = element?.getBoundingClientRect()
       const transform = window.getComputedStyle(element)?.getPropertyValue('transform')
       
-      if (transform) {
-        const matrix = transform.match(/^matrix\((.+)\)$/)
+      if (transform !== 'none') {
+      	const matrix = transform.match(/^matrix\((.+)\)$/)
         if (matrix) {
           const matrixValues = matrix[1].split(', ')
           const translateX = parseInt(matrixValues[4])
@@ -896,6 +894,13 @@ app.component('SparkLine', {
             translateX,
             width: clientRect?.width
           }
+        }
+      } else {
+      	return {
+          left: clientRect?.left,
+          right: clientRect?.right,
+          translateX: null,
+          width: clientRect?.width
         }
       }
       
@@ -915,61 +920,62 @@ app.component('SparkLine', {
         .sort((a, b) => {
           return a.offset >= b.offset ? 1 : -1
         })
-       const points = sortedPoints.map((point) => {
-       const valueBounds = this[`${point.point}Ref`] ? this.getBoundingClientRectWithTransform(this[`${point.point}Ref`].querySelector('.kpi-point-value')) : null
-          //console.log('pointBounds', pointBounds) 
-       	point.valueBounds = valueBounds
+      
+      const points = sortedPoints.map((point) => {
+       const valueBounds = this[`${point.point}Ref`] ? this.getBoundingClientRectWithTransform(this[`${point.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock')) : null
+        point.valueBounds = valueBounds
         return point
        })
-       
-       this.preventLabelOverlap(points)
+      
+      this.preventLabelOverlap(points)
     },
     preventLabelOverlap(labelElems) {
     	const minOffset = 0  
       let offset = 0
        
       labelElems.forEach((labelElem, i) => {
-        labelElem.translateX = null
         console.log('labelElem', labelElem)
-       	this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style = ''
-    		
-				if (i > 0) {
+				const labelWidth = labelElem.valueBounds ? labelElem.valueBounds.width : null
+				if (this[`${labelElem.point}Ref`]) {
+        	this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style = ''
+        }
+        
+       	if (i > 0) {
         	const prevLabelElem = labelElems[i - 1]
       		const prevLabelElemValueBounds = prevLabelElem.valueBounds
       		const labelElemValueBounds = labelElem.valueBounds
         
         	if (labelElemValueBounds && prevLabelElemValueBounds) {
-        		const prevLabelLeft = prevLabelElem.valueBounds.left
+        		const prevLabelWidth = prevLabelElem.valueBounds.width
+            const prevLabelLeft = prevLabelElem.valueBounds.left
             const prevLabelRight = prevLabelElem.valueBounds.right
-						const prevLabelWidth = prevLabelElem.valueBounds.width
-            const labelLeft = labelElem.valueBounds.left
+            // const prevLabelLeft = prevLabelElem.valueBounds.left - prevLabelWidth/2 + 4
+            // const prevLabelRight = prevLabelElem.valueBounds.right - prevLabelWidth/2 + 4
+						const labelLeft = labelElem.valueBounds.left
             const labelRight = labelElem.valueBounds.right
-            const labelWidth = labelElem.valueBounds.width
-       
-       			if ( prevLabelRight + offset > labelLeft && prevLabelLeft + offset < labelRight ) {
-        			if (labelRight < prevLabelRight + offset && labelLeft > prevLabelLeft + offset ) {
-                console.log('labelElem >', labelElem, offset)
-								offset = prevLabelRight + offset - this[`${prevLabelElem.point}Ref`].getBoundingClientRect().left - prevLabelWidth/2 + minOffset
-							} else {
-                console.log('labelElem >>', labelElem, offset)
-								offset = prevLabelRight + offset - labelLeft + minOffset
-              }
-              
-              /*if (offset < 4) {
-                console.log('min offset >>>>>>>>>>>>>>', offset)
-              	offset += 4
-              }*/
-							
-							console.log('set offset', offset, prevLabelLeft, prevLabelRight, labelLeft, labelRight)
-        			labelElem.translateX = offset + labelWidth/2
-        			this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.transform = `translateX(${offset + labelWidth/2}px)`
+            // const labelLeft = labelElem.valueBounds.left - labelWidth/2 + 4
+            // const labelRight = labelElem.valueBounds.right - labelWidth/2 + 4
+            
+            if ( ( prevLabelRight + offset > labelLeft && prevLabelLeft + offset < labelRight ) ||
+                 ( prevLabelRight + offset > labelLeft && prevLabelLeft + offset > labelRight ) ) {
+        			offset = prevLabelRight + offset - labelLeft + minOffset
+              console.log('set offset', offset, prevLabelLeft, prevLabelRight, labelLeft, labelRight)
+        			// this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset - labelWidth/2 + 4}px`
+              this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset}px`
             } else {
 							console.log('labelElem >>>', labelElem)
               offset = 0
-        			labelElem.translateX = null
-							this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style = ''
+              // this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset - labelWidth/2 + 4}px`
+              this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset}px`
             }
         	}
+        } else {
+					if (this[`${labelElem.point}Ref`]) {
+						// this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset - labelWidth/2 + 4}px`
+            offset = 0
+            this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style = ''
+					}
+        	
         }
       })
       
@@ -991,6 +997,8 @@ app.component('SparkLine', {
         minValueElBounds.left < maxValueElBounds.right &&
         minValueElBounds.right > maxValueElBounds.left
       )
+      
+      console.log('bounds', minValueElBounds, maxValueElBounds)
       
       const overlapMinMaxTitle = (
         minTitleElBounds != null && maxTitleElBounds != null &&
@@ -1044,14 +1052,18 @@ app.component('SparkLine', {
       const value = type === 'percent' ? Math.round(pointValue * 100) : Math.round(pointValue)
       const offset = type === 'percent' ? 
             value : Math.round((value/this.maxValue)*100)
-      const displayValue = type === 'percent' ? `${value}%` : this.shortenNumber(value)
+			const displayValueSuffix = pointValue === this.maxValue ? '(max)' :
+                                 (pointValue === this.minValue ? '(min)' : '')
+      const displayValue = type === 'percent' ? `${value}%${displayValueSuffix}` : `${this.shortenNumber(value)}${displayValueSuffix}`
       
       return {
         point,
+				value,
         el,
         market,
         type,
       	displayValue,
+				displayValueSuffix,
         offset,
 				isMax: pointValue === this.maxValue,
 				isMin: pointValue === this.minValue
