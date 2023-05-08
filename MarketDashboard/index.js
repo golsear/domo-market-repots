@@ -780,7 +780,7 @@ app.component('SparkLine', {
   },
   mounted () {
     console.log('SparkLine: mounted: data', this.data, this.secondMarketData, this.firstMarketData)
-    this.setPoints()
+    // this.setPoints()
   },
   computed: {
     maxValue () {
@@ -793,36 +793,49 @@ app.component('SparkLine', {
   methods: {
     setPoints () {
       if (this.data) {
-        const minPointData = this.data.closestMinMaxData.min
-        const minPoint = isFinite(minPointData.closestMin.value) ?
-              this.getPoint(minPointData.closestMin.data.data[1], 'minMarketPoint') :
-              (isFinite(minPointData.closestMax.value) ?
-                this.getPoint(minPointData.closestMax.data.data[1], 'minMarketPoint') :
-                null)
-        const maxPointData = this.data.closestMinMaxData.max
-        const maxPoint = isFinite(maxPointData.closestMax.value) ? 
-              this.getPoint(maxPointData.closestMax.data.data[1], 'maxMarketPoint') :
-              (isFinite(maxPointData.closestMin.value) ? 
-                this.getPoint(maxPointData.closestMin.data.data[1], 'maxMarketPoint') :
-                null)
-        const firstPoint = this.data.firstMarketData && this.data.firstMarketData.data.length === 2 ?
-              this.getPoint(this.data.firstMarketData.data[1], 'firstMarketPoint') :
-              null
-        const secondPoint = this.data.secondMarketData && this.data.secondMarketData.data.length === 2 ?
-              this.getPoint(this.data.secondMarketData.data[1], 'secondMarketPoint') :
-              null
-        const lineSelectedRange = this.getLineSelectedRange(firstPoint, secondPoint)
-        const lineRange = this.getLineRange (firstPoint, secondPoint, minPoint, maxPoint)
-
         this.points = {
-          min: minPoint,
-          max: maxPoint,
-          first: firstPoint,
-          second: secondPoint,
-          lineSelectedRange,
-          lineRange
-        }
+      		min: null,
+        	max: null,
+        	first: null,
+        	second: null
+      	}
+        forceNextTick(() => {
+          const minPointData = this.data.closestMinMaxData.min
+          const minPoint = isFinite(minPointData.closestMin.value) ?
+                this.getPoint(minPointData.closestMin.data.data[1], 'minMarketPoint') :
+          (isFinite(minPointData.closestMax.value) ?
+           this.getPoint(minPointData.closestMax.data.data[1], 'minMarketPoint') :
+           null)
+          const maxPointData = this.data.closestMinMaxData.max
+          const maxPoint = isFinite(maxPointData.closestMax.value) ? 
+                this.getPoint(maxPointData.closestMax.data.data[1], 'maxMarketPoint') :
+          (isFinite(maxPointData.closestMin.value) ? 
+           this.getPoint(maxPointData.closestMin.data.data[1], 'maxMarketPoint') :
+           null)
+          
+          const firstPoint = this.data.firstMarketData && this.data.firstMarketData.data.length === 2 ?
+                this.getPoint(this.data.firstMarketData.data[1], 'firstMarketPoint') :
+                null
+          const secondPoint = this.data.secondMarketData && this.data.secondMarketData.data.length === 2 ?
+                this.getPoint(this.data.secondMarketData.data[1], 'secondMarketPoint') :
+                null
+          const lineSelectedRange = this.getLineSelectedRange(firstPoint, secondPoint)
+          const lineRange = this.getLineRange (firstPoint, secondPoint, minPoint, maxPoint)
+
+          this.points = {
+            min: minPoint,
+            max: maxPoint,
+            first: firstPoint,
+            second: secondPoint,
+            lineSelectedRange,
+            lineRange
+          }
+        })
         
+        /*setTimeout(() => {
+        	console.log('FIX POSITION')
+          this.fixPosition_()
+        }, 3000)*/
         forceNextTick(() => {
           if (this.mockLabels) {
             this.fixPosition_()
@@ -936,8 +949,9 @@ app.component('SparkLine', {
       labelElems.forEach((labelElem, i) => {
         console.log('labelElem', labelElem)
 				const labelWidth = labelElem.valueBounds ? labelElem.valueBounds.width : null
-				if (this[`${labelElem.point}Ref`]) {
-        	this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style = ''
+				console.log('labelElem', labelElem)
+        if (this[`${labelElem.point}Ref`]) {
+          // this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style = ''
         }
         
        	if (i > 0) {
@@ -959,21 +973,31 @@ app.component('SparkLine', {
             if ( ( prevLabelRight + offset > labelLeft && prevLabelLeft + offset < labelRight ) ||
                  ( prevLabelRight + offset > labelLeft && prevLabelLeft + offset > labelRight ) ) {
         			offset = prevLabelRight + offset - labelLeft + minOffset
-              console.log('set offset', offset, prevLabelLeft, prevLabelRight, labelLeft, labelRight)
-        			// this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset - labelWidth/2 + 4}px`
+              // this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset - labelWidth/2 + 4}px`
               this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset}px`
-            } else {
+              console.log('labelElem >', labelElem)
+              console.log('set offset >', offset, prevLabelLeft, prevLabelRight, labelLeft, labelRight)
+            } else if (prevLabelRight + offset == labelLeft) {
+            	offset = prevLabelWidth + offset
+              console.log('labelElem >>', labelElem)
+              console.log('set offset >>', offset, prevLabelLeft, prevLabelRight, labelLeft, labelRight)
+              this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset}px`
+            } 
+            else {
 							console.log('labelElem >>>', labelElem)
+              console.log('set offset >>>', offset, prevLabelLeft, prevLabelRight, labelLeft, labelRight)
               offset = 0
               // this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset - labelWidth/2 + 4}px`
               this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset}px`
             }
+            
+            
         	}
         } else {
 					if (this[`${labelElem.point}Ref`]) {
 						// this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset - labelWidth/2 + 4}px`
             offset = 0
-            this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style = ''
+            // this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style = ''
 					}
         	
         }
@@ -997,8 +1021,6 @@ app.component('SparkLine', {
         minValueElBounds.left < maxValueElBounds.right &&
         minValueElBounds.right > maxValueElBounds.left
       )
-      
-      console.log('bounds', minValueElBounds, maxValueElBounds)
       
       const overlapMinMaxTitle = (
         minTitleElBounds != null && maxTitleElBounds != null &&
