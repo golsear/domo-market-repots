@@ -151,11 +151,20 @@
   z-index: 25;
 }
 
+.kpi-point-first-market ._kpi-point-value {
+	top: -23px;
+  font-size: 14px;
+  left: 50%;
+  line-height: 16px;
+  transform: translateX(-50%);
+}
+
 .kpi-point-first-market .kpi-point-value {
 	top: -23px;
   font-size: 14px;
   line-height: 16px;
 }
+
 
 .kpi-point-value {
   position: absolute;

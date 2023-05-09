@@ -961,43 +961,44 @@ app.component('SparkLine', {
         
         	if (labelElemValueBounds && prevLabelElemValueBounds) {
         		const prevLabelWidth = prevLabelElem.valueBounds.width
-            const prevLabelLeft = prevLabelElem.valueBounds.left
-            const prevLabelRight = prevLabelElem.valueBounds.right
-            // const prevLabelLeft = prevLabelElem.valueBounds.left - prevLabelWidth/2 + 4
-            // const prevLabelRight = prevLabelElem.valueBounds.right - prevLabelWidth/2 + 4
-						const labelLeft = labelElem.valueBounds.left
-            const labelRight = labelElem.valueBounds.right
-            // const labelLeft = labelElem.valueBounds.left - labelWidth/2 + 4
-            // const labelRight = labelElem.valueBounds.right - labelWidth/2 + 4
+            // const prevLabelLeft = prevLabelElem.valueBounds.left
+            // const prevLabelRight = prevLabelElem.valueBounds.right
+            const prevLabelLeft = prevLabelElem.valueBounds.left - prevLabelWidth/2 + 4
+            const prevLabelRight = prevLabelElem.valueBounds.right - prevLabelWidth/2 + 4
+						// const labelLeft = labelElem.valueBounds.left
+            // const labelRight = labelElem.valueBounds.right
+            const labelLeft = labelElem.valueBounds.left - labelWidth/2 + 4
+            const labelRight = labelElem.valueBounds.right - labelWidth/2 + 4
             
             if ( ( prevLabelRight + offset > labelLeft && prevLabelLeft + offset < labelRight ) ||
                  ( prevLabelRight + offset > labelLeft && prevLabelLeft + offset > labelRight ) ) {
         			offset = prevLabelRight + offset - labelLeft + minOffset
-              // this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset - labelWidth/2 + 4}px`
-              this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset}px`
+              this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset - labelWidth/2 + 4}px`
+              // this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset}px`
               console.log('labelElem >', labelElem)
               console.log('set offset >', offset, prevLabelLeft, prevLabelRight, labelLeft, labelRight)
             } else if (prevLabelRight + offset == labelLeft) {
             	offset = prevLabelWidth + offset
               console.log('labelElem >>', labelElem)
               console.log('set offset >>', offset, prevLabelLeft, prevLabelRight, labelLeft, labelRight)
-              this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset}px`
+              this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset - labelWidth/2 + 4}px`
+              // this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset}px`
             } 
             else {
 							console.log('labelElem >>>', labelElem)
               console.log('set offset >>>', offset, prevLabelLeft, prevLabelRight, labelLeft, labelRight)
               offset = 0
-              // this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset - labelWidth/2 + 4}px`
-              this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset}px`
+              this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset - labelWidth/2 + 4}px`
+              // this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset}px`
             }
             
             
         	}
         } else {
 					if (this[`${labelElem.point}Ref`]) {
-						// this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset - labelWidth/2 + 4}px`
-            offset = 0
-            // this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style = ''
+						offset = 0
+            this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset - labelWidth/2 + 4}px`
+            // this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset}px`
 					}
         	
         }
