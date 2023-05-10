@@ -6,7 +6,7 @@ const datasets = window.datasets
 
 const mockupMode = false
 const mockupFilters = false
-const mockLabels = false
+const mockLabels = true
 
 const fields = [
   'Market', 
@@ -800,6 +800,13 @@ app.component('SparkLine', {
         	second: null
       	}
         forceNextTick(() => {
+          const firstPoint = this.data.firstMarketData && this.data.firstMarketData.data.length === 2 ?
+                this.getPoint(this.data.firstMarketData.data[1], 'firstMarketPoint') :
+                null
+          const secondPoint = this.data.secondMarketData && this.data.secondMarketData.data.length === 2 ?
+                this.getPoint(this.data.secondMarketData.data[1], 'secondMarketPoint') :
+                null
+          const lineSelectedRange = this.getLineSelectedRange(firstPoint, secondPoint)
           const minPointData = this.data.closestMinMaxData.min
           const minPoint = isFinite(minPointData.closestMin.value) ?
                 this.getPoint(minPointData.closestMin.data.data[1], 'minMarketPoint') :
@@ -812,19 +819,13 @@ app.component('SparkLine', {
           (isFinite(maxPointData.closestMin.value) ? 
            this.getPoint(maxPointData.closestMin.data.data[1], 'maxMarketPoint') :
            null)
-          
-          const firstPoint = this.data.firstMarketData && this.data.firstMarketData.data.length === 2 ?
-                this.getPoint(this.data.firstMarketData.data[1], 'firstMarketPoint') :
-                null
-          const secondPoint = this.data.secondMarketData && this.data.secondMarketData.data.length === 2 ?
-                this.getPoint(this.data.secondMarketData.data[1], 'secondMarketPoint') :
-                null
-          const lineSelectedRange = this.getLineSelectedRange(firstPoint, secondPoint)
           const lineRange = this.getLineRange (firstPoint, secondPoint, minPoint, maxPoint)
-
-          this.points = {
-            min: minPoint,
-            max: maxPoint,
+          
+					this.points = {
+            min: !firstPoint.isMin && !secondPoint.isMin ? minPoint : null,
+            max: !firstPoint.isMax && !secondPoint.isMax ? maxPoint : null,
+            // min: minPoint,
+            // max: maxPoint,
             first: firstPoint,
             second: secondPoint,
             lineSelectedRange,
@@ -925,56 +926,89 @@ app.component('SparkLine', {
       }
     },
   	fixPosition_ () {
-      const sortedPoints = [
-        { ...this.points.min },
-        { ...this.points.max },
-        { ...this.points.second }
-        ]
-        .sort((a, b) => {
+      const filteredPoints = []
+      const filteredPointsKeys = ['min', 'max', 'second']
+      for (const key in this.points) {
+        if (this.points[key] && filteredPointsKeys.includes(key)) {
+          filteredPoints.push(Object.assign({}, this.points[key]))
+        }
+      }
+      console.log('FILTERED POINTS', filteredPoints)
+      const sortedPoints = filteredPoints.sort((a, b) => {
           return a.offset >= b.offset ? 1 : -1
-        })
+      })
       
+      console.log('POINTS', this.points)
+      console.log('SORTED POINTS', sortedPoints)
       const points = sortedPoints.map((point) => {
-       const valueBounds = this[`${point.point}Ref`] ? this.getBoundingClientRectWithTransform(this[`${point.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock')) : null
+        console.log('POINT', point)
+       	const valueBounds = this[`${point.point}Ref`] ? this.getBoundingClientRectWithTransform(this[`${point.point}Ref`].querySelector('.kpi-point-value')) : null
         point.valueBounds = valueBounds
+        
+        if (point.point === 'minMarketPoint' || point.point === 'maxMarketPoint') {
+        	const titleBounds = this[`${point.point}Ref`] ? this.getBoundingClientRectWithTransform(this[`${point.point}Ref`].querySelector('.kpi-point-title')) : null
+          point.titleBounds = titleBounds
+        }
         return point
        })
       
       this.preventLabelOverlap(points)
     },
     preventLabelOverlap(labelElems) {
+      const minPoint = labelElems.find((point) => point.point === 'minMarketPoint')
+      const maxPoint = labelElems.find((point) => point.point === 'maxMarketPoint')
+      
+      if (minPoint) {
+        const minPointTitleWidth = minPoint.titleBounds ? minPoint.titleBounds.width : null
+        this[`${minPoint.point}Ref`].querySelector('.kpi-point-title.kpi-point-title-mock').style.left = `${- minPointTitleWidth/2 + 4}px`
+      } 
+      if (maxPoint) {
+        const maxPointTitleWidth = maxPoint.titleBounds ? maxPoint.titleBounds.width : null
+        this[`${maxPoint.point}Ref`].querySelector('.kpi-point-title.kpi-point-title-mock').style.left = `${- maxPointTitleWidth/2 + 4}px`         
+      }
+      
+      if (minPoint && maxPoint) {
+        const minPointTitleBounds = minPoint.titleBounds
+        const minPointTitleWidth = minPointTitleBounds.width
+        const minPointTitleLeft = minPointTitleBounds.left - minPointTitleWidth/2 + 4
+        const minPointTitleRight = minPointTitleBounds.right - minPointTitleWidth/2 + 4
+        
+        const maxPointTitleBounds = maxPoint.titleBounds
+        const maxPointTitleWidth = maxPointTitleBounds.width
+        const maxPointTitleLeft = maxPointTitleBounds.left - maxPointTitleWidth/2 + 4
+        const maxPointTitleRight = maxPointTitleBounds.right - maxPointTitleWidth/2 + 4
+            
+        if ( ( minPointTitleRight > maxPointTitleLeft && minPointTitleLeft < maxPointTitleRight ) ||
+            ( minPointTitleRight === maxPointTitleRight && minPointTitleLeft === maxPointTitleLeft ) ) {
+        }
+      }
+      ////////////
+      console.log(labelElems)
     	const minOffset = 0  
       let offset = 0
+      
+      console.log('MIN MAX', minPoint, maxPoint)
        
       labelElems.forEach((labelElem, i) => {
         console.log('labelElem', labelElem)
 				const labelWidth = labelElem.valueBounds ? labelElem.valueBounds.width : null
-				console.log('labelElem', labelElem)
-        if (this[`${labelElem.point}Ref`]) {
-          // this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style = ''
-        }
-        
-       	if (i > 0) {
+				
+        if (i > 0) {
         	const prevLabelElem = labelElems[i - 1]
       		const prevLabelElemValueBounds = prevLabelElem.valueBounds
       		const labelElemValueBounds = labelElem.valueBounds
         
         	if (labelElemValueBounds && prevLabelElemValueBounds) {
         		const prevLabelWidth = prevLabelElem.valueBounds.width
-            // const prevLabelLeft = prevLabelElem.valueBounds.left
-            // const prevLabelRight = prevLabelElem.valueBounds.right
             const prevLabelLeft = prevLabelElem.valueBounds.left - prevLabelWidth/2 + 4
             const prevLabelRight = prevLabelElem.valueBounds.right - prevLabelWidth/2 + 4
-						// const labelLeft = labelElem.valueBounds.left
-            // const labelRight = labelElem.valueBounds.right
-            const labelLeft = labelElem.valueBounds.left - labelWidth/2 + 4
+						const labelLeft = labelElem.valueBounds.left - labelWidth/2 + 4
             const labelRight = labelElem.valueBounds.right - labelWidth/2 + 4
             
             if ( ( prevLabelRight + offset > labelLeft && prevLabelLeft + offset < labelRight ) ||
                  ( prevLabelRight + offset > labelLeft && prevLabelLeft + offset > labelRight ) ) {
         			offset = prevLabelRight + offset - labelLeft + minOffset
               this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset - labelWidth/2 + 4}px`
-              // this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset}px`
               console.log('labelElem >', labelElem)
               console.log('set offset >', offset, prevLabelLeft, prevLabelRight, labelLeft, labelRight)
             } else if (prevLabelRight + offset == labelLeft) {
@@ -982,25 +1016,20 @@ app.component('SparkLine', {
               console.log('labelElem >>', labelElem)
               console.log('set offset >>', offset, prevLabelLeft, prevLabelRight, labelLeft, labelRight)
               this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset - labelWidth/2 + 4}px`
-              // this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset}px`
             } 
             else {
 							console.log('labelElem >>>', labelElem)
               console.log('set offset >>>', offset, prevLabelLeft, prevLabelRight, labelLeft, labelRight)
               offset = 0
               this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset - labelWidth/2 + 4}px`
-              // this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset}px`
             }
-            
-            
-        	}
+          }
         } else {
 					if (this[`${labelElem.point}Ref`]) {
+            console.log('labelElem >>>>', labelElem)
 						offset = 0
             this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset - labelWidth/2 + 4}px`
-            // this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset}px`
-					}
-        	
+          }
         }
       })
       

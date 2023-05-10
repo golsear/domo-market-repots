@@ -154,6 +154,10 @@
                         <div :class="['kpi-point-title', slotProps.overlap.minTitle ? 'kpi-point-title-overlap' : '']">
                           <span class="kpi-point-value-overlap" v-if="slotProps.overlap.minValue">{{ slotProps.points.min?.displayValue }}</span>{{ slotProps.points.min?.market }}
                         </div>
+                        <div v-if="slotProps.mockLabels" 
+                             :class="['kpi-point-title kpi-point-title-mock', slotProps.overlap.minTitle ? 'kpi-point-title-overlap' : '']">
+                          <span class="kpi-point-value-overlap" v-if="slotProps.overlap.minValue">{{ slotProps.points.min?.displayValue }}</span>{{ slotProps.points.min?.market }}
+                        </div>
                       </div>
                       <div v-if="slotProps.points.first"
                            :ref="(el) => slotProps.setElement(el, 'firstMarketPoint')"
@@ -187,6 +191,10 @@
                           {{ slotProps.points.max?.displayValue }}
                         </div>
                         <div :class="['kpi-point-title', slotProps.overlap.maxTitle ? 'kpi-point-title-overlap' : '']">
+                          {{ slotProps.points.max?.market }} <span class="kpi-point-value-overlap" v-if="slotProps.overlap.maxValue">{{ slotProps.points.max?.displayValue }}</span>
+                        </div>
+                        <div v-if="slotProps.mockLabels"
+                             :class="['kpi-point-title kpi-point-title-mock', slotProps.overlap.maxTitle ? 'kpi-point-title-overlap' : '']">
                           {{ slotProps.points.max?.market }} <span class="kpi-point-value-overlap" v-if="slotProps.overlap.maxValue">{{ slotProps.points.max?.displayValue }}</span>
                         </div>
                       </div>

@@ -151,7 +151,7 @@
   z-index: 25;
 }
 
-.kpi-point-first-market ._kpi-point-value {
+.kpi-point-first-market .kpi-point-value {
 	top: -23px;
   font-size: 14px;
   left: 50%;
@@ -166,7 +166,7 @@
 }
 
 
-.kpi-point-value {
+._kpi-point-value {
   position: absolute;
   right: 50%;
   transform: translate(50%,0);
@@ -177,7 +177,7 @@
   white-space: nowrap;
 }
 
-._kpi-point-value {
+.kpi-point-value {
   position: absolute;
   right: auto;
   left: 0;
@@ -188,7 +188,6 @@
   font-weight: bold;
   white-space: nowrap;
 }
-
 
 .kpi-point-value-overlap {
   display: inline-block;
@@ -227,7 +226,7 @@
   top: -36px;
 }
 
-.kpi-point-title {
+._kpi-point-title {
   position: absolute;
   right: 50%;
   transform: translate(50%,0);
@@ -238,7 +237,7 @@
   white-space: nowrap;
 }
 
-._kpi-point-title {
+.kpi-point-title {
   position: absolute;
   right: auto;
   left: 0;
@@ -248,6 +247,10 @@
   line-height: 14px;
   font-weight: bold;
   white-space: nowrap;
+}
+
+.kpi-point-title.kpi-point-title-mock {
+  bottom: -40px;
 }
 
 
@@ -366,7 +369,7 @@
 	width: 1px;
 }
 
-.visibility-hidden {
+._visibility-hidden {
 	visibility: hidden;
 }
 
