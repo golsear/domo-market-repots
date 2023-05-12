@@ -792,6 +792,7 @@ app.component('SparkLine', {
     if (debugMode) {
     	console.log('SparkLine: mounted: data', this.data)
     }
+    this.setPoints()
   },
   computed: {
     maxValue () {
@@ -801,7 +802,6 @@ app.component('SparkLine', {
     	return this.data ? this.data.minValue : 0
     },
     cssPointColor () {
-      console.log('cssPointColor', this.points)
       return this.points.first && this.points.second ?
         ( this.points.first.value < this.points.second.value ? 'poor' : 'good' ) :
       	''

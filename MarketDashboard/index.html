@@ -121,14 +121,15 @@
                   <div class="kpi-description">{{ slotProps.description }}</div>
                 </div>
                 <div class="spark-line-column">
-                  <spark-line :data="slotProps.sparkLineData"
+                  <spark-line v-if="slotProps.sparkLineData" 
+                              :data="slotProps.sparkLineData"
                               v-slot="slotProps">
                     <div v-if="slotProps.mock"
                          style="margin-bottom: 50px">
                     	<div>firstMarketPoint: {{ slotProps.points.first }}<br/><br/></div>
                     	<div>secondMarketPoint: {{ slotProps.points.second }}<br/><br/></div>
                     	<div>minMarketPoint: {{ slotProps.points.min }}<br/><br/></div>
-                    	<div>maxMarketPoint: {{ slotProps.points.max }}</div>
+                    	<div>maxMarketPoint: {{ slotProps.points.max }}<br/><br/></div>
                       <div>cssPointColor: {{ slotProps.cssPointColor }}</div>
                     </div>
                     
@@ -202,15 +203,20 @@
                       </div>
                     </div>
                   </spark-line>
+                  <div v-else>
+                  	New KPI coming soon
+                  </div>
                 </div>
                 <div class="align-items-center">
-                  <div :class="'kpi-change kpi-change-' + slotProps.firstKpiChangeCss">
+                  <div v-if="slotProps.sparkLineData" 
+                       :class="'kpi-change kpi-change-' + slotProps.firstKpiChangeCss">
                     {{ slotProps.firstKpiChange }}% 
                     <div :class="'kpi-change-arrow kpi-change-arrow-' + slotProps.firstKpiChangeCss"></div>
                   </div> 
                 </div>
                 <div class="align-items-center">
-                  <div :class="'kpi-change kpi-change-' + slotProps.secondKpiChangeCss">
+                  <div v-if="slotProps.sparkLineData" 
+                       :class="'kpi-change kpi-change-' + slotProps.secondKpiChangeCss">
                     {{ slotProps.secondKpiChange }}% 
                     <div :class="'kpi-change-arrow kpi-change-arrow-' + slotProps.secondKpiChangeCss"></div>
                   </div> 
