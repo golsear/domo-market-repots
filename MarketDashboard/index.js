@@ -7,6 +7,7 @@ const datasets = window.datasets
 const mockupMode = false
 const mockupFilters = false
 const mockLabels = true
+const debugMode = false
 
 const fields = [
   'Market', 
@@ -46,8 +47,9 @@ const mockFilters = [
         operand: 'IN',
         values: [
             'United Kingdom',
-            'United States'
+            // 'United States'
           	//'Mexico'
+          	'Global'
         ],
         dataType: 'string',
         label: 'Market',
@@ -278,7 +280,7 @@ app.component('MarketDashboard', {
       const groupedData = []
       const dataGroupByKPI = this.groupByProperty(this.data, 'KPI')
       
-      console.log('dataGroupByKPI', dataGroupByKPI)
+      if (debugMode) { console.log('MarketDashboard: computed: dataGroupByCategory: dataGroupByKPI', dataGroupByKPI) }
       
       for (const [category, kpiCategories] of Object.entries(this.categoryDictionary)) {
         const kpis = []
@@ -351,9 +353,10 @@ app.component('MarketDashboard', {
         const data = await domo.get(this.query)
         this.setIsLoading(false)
         this.data = data 
-        
-        console.log('MarketDashboard: data', this.query, data)
-      	console.log('dataGroupByCategory', this.dataGroupByCategory);    
+        if (debugMode) { 
+        	console.log('MarketDashboard: getData: query, data', this.query, data)
+      		console.log('MarketDashboard: getData: dataGroupByCategory', this.dataGroupByCategory)
+        }
       } catch (error) {
       	console.log(error)
         this.setIsLoading(false)
@@ -366,7 +369,7 @@ app.component('MarketDashboard', {
     },
     groupByProperty,
     updateData (filters) {
-    	console.log('updateData:filters', filters)
+      if (debugMode) { console.log('MarketDashboard: updateData: filters', filters) }
       const marketFilter = filters.filter((filter) => filter.column === 'Market')[0]
       const yearFilter = filters.filter((filter) => filter.column === 'Year')[0]
       if (marketFilter && yearFilter) {
@@ -526,7 +529,7 @@ app.component('KpiRow', {
         const dataByMarket = this.dataByMarket
         const dataByExcludedSelectedMarkets = dataByMarket.filter(obj => obj.category !== firstMarketData.category && obj.category !== secondMarketData.category)
 
-        console.log('=== >>> ===')
+        if (debugMode) { console.log('=== KpiRow: computed: sparkLineData >>>') }
         if (firstValue === secondValue) {
           maxSelectedMarketsValue = minSelectedMarketsValue = firstValue
         } else {
@@ -548,17 +551,18 @@ app.component('KpiRow', {
         
         allValues.sort()
         values.sort()
-        // maxSelectedMarketsValue = 0.5
         
         const closestMinMaxData = this.getClosestMaxMinMarketValues(dataByExcludedSelectedMarkets, maxSelectedMarketsValue, minSelectedMarketsValue)
         
-        console.log('allValues', allValues)
-        console.log('values', values)
-        console.log('max value', Math.max(...allValues))
-        console.log('minSelectedMarketsValue', minSelectedMarketsValue)
-        console.log('maxSelectedMarketsValue', maxSelectedMarketsValue)
-        console.log('closestMinMaxData', closestMinMaxData)
-        console.log('=== <<< ===')
+        if (debugMode) { 
+          console.log('KpiRow: computed: sparkLineData: allValues', allValues) 
+ 					console.log('KpiRow: computed: sparkLineData: values', values) 
+        	console.log('KpiRow: computed: sparkLineData: max allValues', Math.max(...allValues))
+          console.log('KpiRow: computed: sparkLineData: minSelectedMarketsValue', minSelectedMarketsValue)
+          console.log('KpiRow: computed: sparkLineData: maxSelectedMarketsValue', maxSelectedMarketsValue)
+          console.log('KpiRow: computed: sparkLineData: closestMinMaxData', closestMinMaxData)
+          console.log('<<< KpiRow: computed: sparkLineData ===') 
+        }
       	return { 
           closestMinMaxData,
           maxValue: Math.max(...allValues),
@@ -585,7 +589,7 @@ app.component('KpiRow', {
         const dataByMarket = mockDataByMarket
         const dataByExcludedSelectedMarkets = dataByMarket.filter(obj => obj.category !== firstMarketData.category && obj.category !== secondMarketData.category)
 
-        console.log('=== >>> ===', firstValue, secondValue)
+        if (debugMode) { console.log('=== KpiRow: computed: mockSparkLineData >>>') }
         if (firstValue === secondValue) {
           maxSelectedMarketsValue = minSelectedMarketsValue = firstValue
         } else {
@@ -607,18 +611,19 @@ app.component('KpiRow', {
         
         allValues.sort()
         values.sort()
-        // maxSelectedMarketsValue = 0.5
         
         const closestMinMaxData = this.getClosestMaxMinMarketValues(dataByExcludedSelectedMarkets, maxSelectedMarketsValue, minSelectedMarketsValue)
         
-        console.log('allValues', allValues)
-        console.log('values', values)
-        console.log('max value', Math.max(...allValues))
-        console.log('minSelectedMarketsValue', minSelectedMarketsValue)
-        console.log('maxSelectedMarketsValue', maxSelectedMarketsValue)
-        console.log('closestMinMaxData', closestMinMaxData)
-        console.log('=== <<< ===')
-      	return { 
+        if (debugMode) { 
+          console.log('KpiRow: computed: mockSparkLineData: allValues', allValues) 
+ 					console.log('KpiRow: computed: mockSparkLineData: values', values) 
+        	console.log('KpiRow: computed: mockSparkLineData: max allValues', Math.max(...allValues))
+          console.log('KpiRow: computed: mockSparkLineData: minSelectedMarketsValue', minSelectedMarketsValue)
+          console.log('KpiRow: computed: mockSparkLineData: maxSelectedMarketsValue', maxSelectedMarketsValue)
+          console.log('KpiRow: computed: mockSparkLineData: closestMinMaxData', closestMinMaxData)
+          console.log('<<< KpiRow: computed: mockSparkLineData ===') 
+        }
+        return { 
           closestMinMaxData,
           maxValue: Math.max(...allValues),
           minValue: Math.min(...allValues),
@@ -650,8 +655,10 @@ app.component('KpiRow', {
           data: data
         })
 			}
-      console.log('dataByMarket', dataByMarket)
-      console.log('groupByMarket', groupByMarket)
+      if (debugMode) {
+      	console.log('KpiRow: watch: data: dataByMarket', dataByMarket)
+      	console.log('KpiRow: watch: data: groupByMarket', groupByMarket)
+    	}
       this.dataByMarket = mockupMode ? mockDataByMarket : dataByMarket
     }
   },
@@ -710,7 +717,7 @@ app.component('KpiRow', {
     },
     getMarketKpiChange (marketKey) {
       const marketData = this.getMarketData(marketKey)
-      console.log('getMarketKpiChange: marketData', marketData)
+      if (debugMode) { console.log('KpiRow: getMarketKpiChange: marketData', marketData) }
       
       if (!marketData || marketData.data.length < 2) {
       	return ''    
@@ -722,7 +729,7 @@ app.component('KpiRow', {
     getMarketKpiChangeCss (marketKey) {
       const kpiChange = this[`${marketKey}MarketKpiChange`]
       
-      return  Math.sign(kpiChange) === -1 ? 'poor' 
+      return Math.sign(kpiChange) === -1 ? 'poor' 
       : kpiChange <= 5 ? 'static' : 'good'
     }
   }
@@ -734,9 +741,11 @@ app.component('SparkLine', {
 								:setElement="setElement"
 								:points="points"
 								:overlap="overlap"
+								:isOverlaps="isOverlaps"
 								:offset="offset"
 								:mock="mock"
-                :mockLabels="mockLabels"> 
+                :mockLabels="mockLabels"
+                :cssPointColor="cssPointColor"> 
 							</slot>
 						</div>`,
   props: [
@@ -759,6 +768,7 @@ app.component('SparkLine', {
         maxValue: false,
         secondValue: false
       },
+      isOverlaps: false,
       points: {
       	min: null,
         max: null,
@@ -779,8 +789,9 @@ app.component('SparkLine', {
   	}
   },
   mounted () {
-    console.log('SparkLine: mounted: data', this.data, this.secondMarketData, this.firstMarketData)
-    // this.setPoints()
+    if (debugMode) {
+    	console.log('SparkLine: mounted: data', this.data)
+    }
   },
   computed: {
     maxValue () {
@@ -789,6 +800,12 @@ app.component('SparkLine', {
     minValue () {
     	return this.data ? this.data.minValue : 0
     },
+    cssPointColor () {
+      console.log('cssPointColor', this.points)
+      return this.points.first && this.points.second ?
+        ( this.points.first.value < this.points.second.value ? 'poor' : 'good' ) :
+      	''
+    }
   },
   methods: {
     setPoints () {
@@ -810,22 +827,20 @@ app.component('SparkLine', {
           const minPointData = this.data.closestMinMaxData.min
           const minPoint = isFinite(minPointData.closestMin.value) ?
                 this.getPoint(minPointData.closestMin.data.data[1], 'minMarketPoint') :
-          (isFinite(minPointData.closestMax.value) ?
-           this.getPoint(minPointData.closestMax.data.data[1], 'minMarketPoint') :
-           null)
+          			(isFinite(minPointData.closestMax.value) ?
+           				this.getPoint(minPointData.closestMax.data.data[1], 'minMarketPoint') :
+           				null)
           const maxPointData = this.data.closestMinMaxData.max
           const maxPoint = isFinite(maxPointData.closestMax.value) ? 
                 this.getPoint(maxPointData.closestMax.data.data[1], 'maxMarketPoint') :
-          (isFinite(maxPointData.closestMin.value) ? 
-           this.getPoint(maxPointData.closestMin.data.data[1], 'maxMarketPoint') :
-           null)
+          			(isFinite(maxPointData.closestMin.value) ? 
+           				this.getPoint(maxPointData.closestMin.data.data[1], 'maxMarketPoint') :
+           				null)
           const lineRange = this.getLineRange (firstPoint, secondPoint, minPoint, maxPoint)
           
 					this.points = {
             min: !firstPoint.isMin && !secondPoint.isMin ? minPoint : null,
             max: !firstPoint.isMax && !secondPoint.isMax ? maxPoint : null,
-            // min: minPoint,
-            // max: maxPoint,
             first: firstPoint,
             second: secondPoint,
             lineSelectedRange,
@@ -833,10 +848,6 @@ app.component('SparkLine', {
           }
         })
         
-        /*setTimeout(() => {
-        	console.log('FIX POSITION')
-          this.fixPosition_()
-        }, 3000)*/
         forceNextTick(() => {
           if (this.mockLabels) {
             this.fixPosition_()
@@ -933,16 +944,12 @@ app.component('SparkLine', {
           filteredPoints.push(Object.assign({}, this.points[key]))
         }
       }
-      console.log('FILTERED POINTS', filteredPoints)
       const sortedPoints = filteredPoints.sort((a, b) => {
           return a.offset >= b.offset ? 1 : -1
       })
       
-      console.log('POINTS', this.points)
-      console.log('SORTED POINTS', sortedPoints)
       const points = sortedPoints.map((point) => {
-        console.log('POINT', point)
-       	const valueBounds = this[`${point.point}Ref`] ? this.getBoundingClientRectWithTransform(this[`${point.point}Ref`].querySelector('.kpi-point-value')) : null
+        const valueBounds = this[`${point.point}Ref`] ? this.getBoundingClientRectWithTransform(this[`${point.point}Ref`].querySelector('.kpi-point-value')) : null
         point.valueBounds = valueBounds
         
         if (point.point === 'minMarketPoint' || point.point === 'maxMarketPoint') {
@@ -978,19 +985,19 @@ app.component('SparkLine', {
         const maxPointTitleLeft = maxPointTitleBounds.left - maxPointTitleWidth/2 + 4
         const maxPointTitleRight = maxPointTitleBounds.right - maxPointTitleWidth/2 + 4
             
-        if ( ( minPointTitleRight > maxPointTitleLeft && minPointTitleLeft < maxPointTitleRight ) ||
-            ( minPointTitleRight === maxPointTitleRight && minPointTitleLeft === maxPointTitleLeft ) ) {
+        if ( minPointTitleRight > maxPointTitleLeft && minPointTitleLeft < maxPointTitleRight ) {
+        	this.isOverlaps = true
+        } else {
+          this.isOverlaps = false
         }
       }
       ////////////
-      console.log(labelElems)
-    	const minOffset = 0  
+      const minOffset = 0  
       let offset = 0
       
-      console.log('MIN MAX', minPoint, maxPoint)
-       
       labelElems.forEach((labelElem, i) => {
-        console.log('labelElem', labelElem)
+        if (debugMode) { console.log('SparkLine: preventLabelOverlap: labelElem', labelElem) }
+        
 				const labelWidth = labelElem.valueBounds ? labelElem.valueBounds.width : null
 				
         if (i > 0) {
@@ -1009,32 +1016,33 @@ app.component('SparkLine', {
                  ( prevLabelRight + offset > labelLeft && prevLabelLeft + offset > labelRight ) ) {
         			offset = prevLabelRight + offset - labelLeft + minOffset
               this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset - labelWidth/2 + 4}px`
-              console.log('labelElem >', labelElem)
-              console.log('set offset >', offset, prevLabelLeft, prevLabelRight, labelLeft, labelRight)
+              if (debugMode) {
+              	console.log('SparkLine: preventLabelOverlap: labelElem >', labelElem, offset, prevLabelLeft, prevLabelRight, labelLeft, labelRight)
+            	}
             } else if (prevLabelRight + offset == labelLeft) {
             	offset = prevLabelWidth + offset
-              console.log('labelElem >>', labelElem)
-              console.log('set offset >>', offset, prevLabelLeft, prevLabelRight, labelLeft, labelRight)
+              if (debugMode) {
+              	console.log('SparkLine: preventLabelOverlap: labelElem >>', labelElem, offset, prevLabelLeft, prevLabelRight, labelLeft, labelRight)
+            	}
               this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset - labelWidth/2 + 4}px`
             } 
             else {
-							console.log('labelElem >>>', labelElem)
-              console.log('set offset >>>', offset, prevLabelLeft, prevLabelRight, labelLeft, labelRight)
+							if (debugMode) {
+              	console.log('SparkLine: preventLabelOverlap: labelElem >>>', labelElem, offset, prevLabelLeft, prevLabelRight, labelLeft, labelRight)
+            	}
               offset = 0
               this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset - labelWidth/2 + 4}px`
             }
           }
         } else {
 					if (this[`${labelElem.point}Ref`]) {
-            console.log('labelElem >>>>', labelElem)
+            if (debugMode) { console.log('SparkLine: preventLabelOverlap: labelElem >>>>', labelElem) }
 						offset = 0
             this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset - labelWidth/2 + 4}px`
           }
         }
       })
-      
-      console.log('=======================', labelElems)  
-		},
+    },
     fixPosition () {
       const secondValueElBounds = this.secondMarketPointRef ? this.getBoundingClientRectWithTransform(this.secondMarketPointRef?.querySelector('.kpi-point-value')) : null
       const minValueElBounds = this.minMarketPointRef ? this.getBoundingClientRectWithTransform(this.minMarketPointRef?.querySelector('.kpi-point-value')) : null
@@ -1093,7 +1101,6 @@ app.component('SparkLine', {
       return num;
     },
   	getPoint (data, point) {
-      // console.log('getPoint: data', data, point)
       if (!data) {
         return null
       }

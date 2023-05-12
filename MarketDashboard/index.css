@@ -119,11 +119,18 @@
 
 .kpi-line-selected-range {
   height: 2px;
-  background: #ba1314;
+  background: #767676;
 	position: absolute;
   z-index: 12;
 }
 
+.kpi-line-selected-range.poor {
+  background: #BA1314;
+}
+
+.kpi-line-selected-range.good {
+  background: #1D9464;
+}
 
 .kpi-point {
   height: 8px;
@@ -146,9 +153,18 @@
 }
 
 .kpi-point-second-market {
-	background: #ba1314;
-  color: #ba1314;
+	color: #333333;
   z-index: 25;
+}
+
+.kpi-point-second-market.poor {
+  background: #BA1314;
+  color: #BA1314;
+}
+
+.kpi-point-second-market.good {
+  background: #1D9464;
+  color: #1D9464;
 }
 
 .kpi-point-first-market .kpi-point-value {
@@ -222,7 +238,7 @@
 }
 
 
-.kpi-point-value.kpi-point-value-mock {
+._kpi-point-value.kpi-point-value-mock {
   top: -36px;
 }
 
@@ -249,10 +265,13 @@
   white-space: nowrap;
 }
 
-.kpi-point-title.kpi-point-title-mock {
+._kpi-point-title.kpi-point-title-mock {
   bottom: -40px;
 }
 
+.kpi-point-title.is-overlaps {
+  bottom: -32px;
+}
 
 .kpi-point-closest-max-market .kpi-point-title.kpi-point-title-overlap {
   bottom: -32px;
@@ -369,7 +388,11 @@
 	width: 1px;
 }
 
-._visibility-hidden {
+.visibility-hidden {
 	visibility: hidden;
+}
+
+._visibility-hidden {
+	opacity: 0.3;
 }
 

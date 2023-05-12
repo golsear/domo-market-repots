@@ -129,6 +129,7 @@
                     	<div>secondMarketPoint: {{ slotProps.points.second }}<br/><br/></div>
                     	<div>minMarketPoint: {{ slotProps.points.min }}<br/><br/></div>
                     	<div>maxMarketPoint: {{ slotProps.points.max }}</div>
+                      <div>cssPointColor: {{ slotProps.cssPointColor }}</div>
                     </div>
                     
                     <div class="kpi-line"
@@ -139,7 +140,8 @@
                            :ref="(el) => slotProps.setElement(el, 'mockLine')"></div>
 											-->
                       <div class="kpi-line-range" :style="`left: ${slotProps.points.lineRange?.left}%; right: ${slotProps.points.lineRange?.right}%`"></div>
-                      <div class="kpi-line-selected-range" :style="`left: ${slotProps.points.lineSelectedRange?.left}%; right: ${slotProps.points.lineSelectedRange?.right}%`"></div>
+                      <div :class="['kpi-line-selected-range', slotProps.cssPointColor]" 
+                           :style="`left: ${slotProps.points.lineSelectedRange?.left}%; right: ${slotProps.points.lineSelectedRange?.right}%`"></div>
                       <div v-if="slotProps.points.min"
                            :ref="(el) => slotProps.setElement(el, 'minMarketPoint')"
                            class="kpi-point kpi-point-closest-min-market" 
@@ -151,7 +153,7 @@
                              :class="['kpi-point-value kpi-point-value-mock', slotProps.overlap.minValue && !!slotProps.mock ? 'visibility-hidden' : '']">
                           {{ slotProps.points.min?.displayValue }}
                         </div>
-                        <div :class="['kpi-point-title', slotProps.overlap.minTitle ? 'kpi-point-title-overlap' : '']">
+                        <div :class="['kpi-point-title', slotProps.overlap.minTitle ? 'kpi-point-title-overlap' : '', slotProps.mockLabels ? 'visibility-hidden' : '']">
                           <span class="kpi-point-value-overlap" v-if="slotProps.overlap.minValue">{{ slotProps.points.min?.displayValue }}</span>{{ slotProps.points.min?.market }}
                         </div>
                         <div v-if="slotProps.mockLabels" 
@@ -169,7 +171,7 @@
                       </div>
                       <div v-if="slotProps.points.second"
                            :ref="(el) => slotProps.setElement(el, 'secondMarketPoint')"
-                           class="kpi-point kpi-point-second-market" 
+                           :class="['kpi-point kpi-point-second-market', slotProps.cssPointColor]" 
                            :style="`left: ${slotProps.points.second?.offset}%;`">
                         <div :class="['kpi-point-value', slotProps.overlap.secondValue || slotProps.mockLabels ? 'visibility-hidden' : '']">
                           {{ slotProps.points.second?.displayValue }}
@@ -190,11 +192,11 @@
                              :class="['kpi-point-value kpi-point-value-mock', slotProps.overlap.maxValue && !slotProps.mock ? 'visibility-hidden' : '']">
                           {{ slotProps.points.max?.displayValue }}
                         </div>
-                        <div :class="['kpi-point-title', slotProps.overlap.maxTitle ? 'kpi-point-title-overlap' : '']">
+                        <div :class="['kpi-point-title', slotProps.overlap.maxTitle ? 'kpi-point-title-overlap' : '', slotProps.mockLabels ? 'visibility-hidden' : '']">
                           {{ slotProps.points.max?.market }} <span class="kpi-point-value-overlap" v-if="slotProps.overlap.maxValue">{{ slotProps.points.max?.displayValue }}</span>
                         </div>
                         <div v-if="slotProps.mockLabels"
-                             :class="['kpi-point-title kpi-point-title-mock', slotProps.overlap.maxTitle ? 'kpi-point-title-overlap' : '']">
+                             :class="['kpi-point-title kpi-point-title-mock', slotProps.isOverlaps ? 'is-overlaps' : '']">
                           {{ slotProps.points.max?.market }} <span class="kpi-point-value-overlap" v-if="slotProps.overlap.maxValue">{{ slotProps.points.max?.displayValue }}</span>
                         </div>
                       </div>
