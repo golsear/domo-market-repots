@@ -272,7 +272,7 @@ app.component('MarketDashboard', {
       secondYear: '',
       firstMarket: '',
       secondMarket: '',
-      isLoading: false,
+      isLoading: false
     }
   },
   computed: {
@@ -388,6 +388,44 @@ app.component('MarketDashboard', {
   }
 })
 
+app.component('OverallScore', {
+	template: `<div class="overall-score">
+							<slot>
+							</slot>
+						</div>`,
+  data () {
+    return { 
+      overallScore: {
+        first: {
+      		'Brand strength': null,
+        	'CSR & Planet': null,
+        	'Digital strength': null,
+        	'Retailer quality': null,
+        	'Sponsoring': null
+        },
+        second: {
+      		'Brand strength': null,
+        	'CSR & Planet': null,
+        	'Digital strength': null,
+        	'Retailer quality': null,
+        	'Sponsoring': null
+        }
+      }
+    }
+  },
+  created () {
+    this.emitter.on('update-overall-change-score-first-market', (event) => {
+      if (debugMode) { console.log('OverallScore: on: update-overall-change-score-first-market', event) }
+      // this.updateKpiSum('first', event.value) 
+    })
+    
+    this.emitter.on('update-overall-change-score-first-market', (event) => {
+      if (debugMode) { console.log('OverallScore: on: update-overall-change-score-second-market', event) }
+      // this.updateKpiSum('second', event.value)
+    })
+  },
+})
+
 app.component('KpiTable', {
   template: `<div class="kpi-table">
 							<slot
@@ -434,6 +472,22 @@ app.component('KpiTable', {
     },
     secondKpiSumCssComputed () {
       return this.getKpiSumCss('second')
+    },
+  },
+  watch: {
+  	firstKpiSumComputed (value) {
+      if (debugMode) { console.log('KpiTable: watch: firstKpiSumComputed', this.data.category, value) } 
+      this.emitter.emit('update-overall-change-score-first-market', {
+     		category: this.data.category,
+        value
+      })
+    },
+    secondKpiSumComputed (value) {
+      if (debugMode) { console.log('KpiTable: watch: secondKpiSumComputed', this.data.category, value) } 
+      this.emitter.emit('update-overall-change-score-second-market', {
+     		category: this.data.category,
+        value
+  		})
     },
   },
   created () {
