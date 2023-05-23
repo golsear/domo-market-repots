@@ -1165,8 +1165,8 @@ app.component('SparkLine', {
       const value = type === 'percent' ? Math.round(pointValue * 100) : Math.round(pointValue)
       const offset = type === 'percent' ? 
             value : Math.round((value/this.maxValue)*100)
-			const displayValueSuffix = pointValue === this.maxValue ? '(max)' :
-                                 (pointValue === this.minValue ? '(min)' : '')
+			const displayValueSuffix = pointValue === this.maxValue ? '<br/>(max)' :
+                                 (pointValue === this.minValue ? '<br/>(min)' : '')
       const displayValue = type === 'percent' ? `${value}%${displayValueSuffix}` : `${this.shortenNumber(value)}${displayValueSuffix}`
       
       return {

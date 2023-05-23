@@ -169,6 +169,8 @@
 
 .kpi-point-first-market .kpi-point-value {
 	top: -23px;
+  top: auto;
+  bottom: 27px;
   font-size: 14px;
   left: 50%;
   line-height: 16px;
@@ -177,6 +179,8 @@
 
 .kpi-point-first-market .kpi-point-value {
 	top: -23px;
+  top: auto;
+  bottom: 27px;
   font-size: 14px;
   line-height: 16px;
 }
@@ -198,11 +202,13 @@
   right: auto;
   left: 0;
   transform: none;
-  top: -16px;
+  top: auto;
+  bottom: 12px;
   font-size: 10px;
   line-height: 12px;
   font-weight: bold;
   white-space: nowrap;
+  text-align: center;
 }
 
 .kpi-point-value-overlap {
@@ -393,6 +399,6 @@
 }
 
 ._visibility-hidden {
-	opacity: 0.3;
+	opacity: 0.6;
 }
 
