@@ -167,7 +167,7 @@
   color: #1D9464;
 }
 
-.kpi-point-first-market .kpi-point-value {
+.kpi-point-first-market ._kpi-point-value {
 	top: -23px;
   top: auto;
   bottom: 27px;
@@ -180,7 +180,7 @@
 .kpi-point-first-market .kpi-point-value {
 	top: -23px;
   top: auto;
-  bottom: 27px;
+  bottom: 22px;
   font-size: 14px;
   line-height: 16px;
 }

@@ -992,7 +992,7 @@ app.component('SparkLine', {
     },
   	fixPosition_ () {
       const filteredPoints = []
-      const filteredPointsKeys = ['min', 'max', 'second']
+      const filteredPointsKeys = ['min', 'max', 'first', 'second']
       for (const key in this.points) {
         if (this.points[key] && filteredPointsKeys.includes(key)) {
           filteredPoints.push(Object.assign({}, this.points[key]))
@@ -1053,23 +1053,26 @@ app.component('SparkLine', {
         if (debugMode) { console.log('SparkLine: preventLabelOverlap: labelElem', labelElem) }
         
 				const labelWidth = labelElem.valueBounds ? labelElem.valueBounds.width : null
-				
+				const offsetCenterLabelElem = labelElem.point === 'firstMarketPoint' ? 10 : 4;
+        
         if (i > 0) {
         	const prevLabelElem = labelElems[i - 1]
       		const prevLabelElemValueBounds = prevLabelElem.valueBounds
-      		const labelElemValueBounds = labelElem.valueBounds
+      		const offsetCenterPrevLabelElem = prevLabelElem.point === 'firstMarketPoint' ? 10 : 4;
+          const labelElemValueBounds = labelElem.valueBounds
+          
         
         	if (labelElemValueBounds && prevLabelElemValueBounds) {
         		const prevLabelWidth = prevLabelElem.valueBounds.width
-            const prevLabelLeft = prevLabelElem.valueBounds.left - prevLabelWidth/2 + 4
-            const prevLabelRight = prevLabelElem.valueBounds.right - prevLabelWidth/2 + 4
-						const labelLeft = labelElem.valueBounds.left - labelWidth/2 + 4
-            const labelRight = labelElem.valueBounds.right - labelWidth/2 + 4
+            const prevLabelLeft = prevLabelElem.valueBounds.left - prevLabelWidth/2 + offsetCenterPrevLabelElem
+            const prevLabelRight = prevLabelElem.valueBounds.right - prevLabelWidth/2 + offsetCenterPrevLabelElem
+						const labelLeft = labelElem.valueBounds.left - labelWidth/2 + offsetCenterLabelElem
+            const labelRight = labelElem.valueBounds.right - labelWidth/2 + offsetCenterLabelElem
             
             if ( ( prevLabelRight + offset > labelLeft && prevLabelLeft + offset < labelRight ) ||
                  ( prevLabelRight + offset > labelLeft && prevLabelLeft + offset > labelRight ) ) {
         			offset = prevLabelRight + offset - labelLeft + minOffset
-              this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset - labelWidth/2 + 4}px`
+              this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset - labelWidth/2 + offsetCenterLabelElem}px`
               if (debugMode) {
               	console.log('SparkLine: preventLabelOverlap: labelElem >', labelElem, offset, prevLabelLeft, prevLabelRight, labelLeft, labelRight)
             	}
@@ -1078,21 +1081,21 @@ app.component('SparkLine', {
               if (debugMode) {
               	console.log('SparkLine: preventLabelOverlap: labelElem >>', labelElem, offset, prevLabelLeft, prevLabelRight, labelLeft, labelRight)
             	}
-              this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset - labelWidth/2 + 4}px`
+              this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset - labelWidth/2 + offsetCenterLabelElem}px`
             } 
             else {
 							if (debugMode) {
               	console.log('SparkLine: preventLabelOverlap: labelElem >>>', labelElem, offset, prevLabelLeft, prevLabelRight, labelLeft, labelRight)
             	}
               offset = 0
-              this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset - labelWidth/2 + 4}px`
+              this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset - labelWidth/2 + offsetCenterLabelElem}px`
             }
           }
         } else {
 					if (this[`${labelElem.point}Ref`]) {
             if (debugMode) { console.log('SparkLine: preventLabelOverlap: labelElem >>>>', labelElem) }
 						offset = 0
-            this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset - labelWidth/2 + 4}px`
+            this[`${labelElem.point}Ref`].querySelector('.kpi-point-value.kpi-point-value-mock').style.left = `${offset - labelWidth/2 + offsetCenterLabelElem}px`
           }
         }
       })

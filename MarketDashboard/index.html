@@ -168,9 +168,12 @@
                            :ref="(el) => slotProps.setElement(el, 'firstMarketPoint')"
                            class="kpi-point kpi-point-first-market" 
                            :style="`left: ${slotProps.points.first?.offset}%;`">
-                        <div class="kpi-point-value"
+                        <div :class="['kpi-point-value', slotProps.mockLabels ? 'visibility-hidden' : '']"
                              v-html="slotProps.points.first?.displayValue">
-                          {{ slotProps.points.first?.displayValue }}
+                        </div>
+                        <div v-if="slotProps.mockLabels" 
+                             class="kpi-point-value kpi-point-value-mock"
+                             v-html="slotProps.points.first?.displayValue">
                         </div>
                       </div>
                       <div v-if="slotProps.points.second"
