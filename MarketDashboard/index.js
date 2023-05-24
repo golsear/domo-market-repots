@@ -390,40 +390,74 @@ app.component('MarketDashboard', {
 
 app.component('OverallScore', {
 	template: `<div class="overall-score">
-							<slot>
+							<slot 
+								:firstOverallScore="firstOverallScore"
+								:secondOverallScore="secondOverallScore">
 							</slot>
 						</div>`,
   data () {
-    return { 
-      overallScore: {
-        first: {
-      		'Brand strength': null,
-        	'CSR & Planet': null,
-        	'Digital strength': null,
-        	'Retailer quality': null,
-        	'Sponsoring': null
-        },
-        second: {
-      		'Brand strength': null,
-        	'CSR & Planet': null,
-        	'Digital strength': null,
-        	'Retailer quality': null,
-        	'Sponsoring': null
-        }
+    return {
+      multiplier: {
+      	'Brand strength': 0.3,
+        'CSR & Planet': 0.2,
+        'Digital strength': 0.15,
+        'Retailer quality': 0.2,
+        'Sponsoring': 0.15
+      },
+      firstOverallScoreByCategory: {
+      	'Brand strength': null,
+        'CSR & Planet': null,
+        'Digital strength': null,
+        'Retailer quality': null,
+        'Sponsoring': null
+      },
+      secondOverallScoreByCategory: {
+      	'Brand strength': null,
+        'CSR & Planet': null,
+        'Digital strength': null,
+        'Retailer quality': null,
+        'Sponsoring': null
       }
     }
   },
+  computed: {
+    firstOverallScore () {
+      let firstOverallScore = null 
+      
+      for (const [key, value] of Object.entries(this.firstOverallScoreByCategory)) {
+  			const multiplier = this.multiplier[key]
+        
+        firstOverallScore += value*multiplier
+      }
+      
+      return firstOverallScore
+    },
+    secondOverallScore () {
+      let secondOverallScore = null 
+      
+      for (const [key, value] of Object.entries(this.secondOverallScoreByCategory)) {
+  			const multiplier = this.multiplier[key]
+        
+        secondOverallScore += value*multiplier
+      }
+      
+      return secondOverallScore
+    }
+  },
   created () {
-    this.emitter.on('update-overall-change-score-first-market', (event) => {
-      if (debugMode) { console.log('OverallScore: on: update-overall-change-score-first-market', event) }
-      // this.updateKpiSum('first', event.value) 
-    })
-    
-    this.emitter.on('update-overall-change-score-first-market', (event) => {
-      if (debugMode) { console.log('OverallScore: on: update-overall-change-score-second-market', event) }
-      // this.updateKpiSum('second', event.value)
+    this.emitter.on('update-overall-change-score', (event) => {
+      this.updateOverallScoreByCategory(event)
     })
   },
+  methods: {
+  	updateOverallScoreByCategory (data) {
+      const market = data.market
+      const category = data.category
+      const overallValue = data.value
+    	if (debugMode) { console.log('OverallScore: updateOverallScoreByCategoryt', market, data) }
+    	this[`${market}OverallScoreByCategory`][category] = overallValue
+    }
+  }
 })
 
 app.component('KpiTable', {
@@ -477,15 +511,17 @@ app.component('KpiTable', {
   watch: {
   	firstKpiSumComputed (value) {
       if (debugMode) { console.log('KpiTable: watch: firstKpiSumComputed', this.data.category, value) } 
-      this.emitter.emit('update-overall-change-score-first-market', {
-     		category: this.data.category,
+      this.emitter.emit('update-overall-change-score', {
+     		market: 'first',
+        category: this.data.category,
         value
       })
     },
     secondKpiSumComputed (value) {
       if (debugMode) { console.log('KpiTable: watch: secondKpiSumComputed', this.data.category, value) } 
-      this.emitter.emit('update-overall-change-score-second-market', {
-     		category: this.data.category,
+      this.emitter.emit('update-overall-change-score', {
+     		market: 'second',
+        category: this.data.category,
         value
   		})
     },

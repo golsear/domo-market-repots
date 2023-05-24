@@ -74,7 +74,14 @@
           <div class="total-value-title total-value-title-static">Static</div>
         </div>
         -->
-      <overall-score>
+      <overall-score v-slot="slotProps">
+        <div style="margin-bottom: 50px">
+          overall score
+          <!--
+          {{ slotProps.firstOverallScore }}
+          {{ slotProps.secondOverallScore }}
+					-->
+				</div>
       </overall-score>
       <template v-for="(dataCategory, index) in slotProps.data" :key="`dataCategory-${index}`">
         <kpi-table 
